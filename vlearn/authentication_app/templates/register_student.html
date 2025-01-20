@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Student</title>
+</head>
+<body>
+    <h1>Register as a Student</h1>
+    <form method="post" action="{% url 'register_student' %}">
+        {% csrf_token %}
+        
+        <!-- Username Field -->
+        <label for="username">Username:</label>
+        <input type="text" name="username" required><br>
+
+        <!-- Password Field -->
+        <label for="password">Password:</label>
+        <input type="password" name="password" required><br>
+
+        <!-- Full Name -->
+        <label for="full_name">Full Name:</label>
+        <input type="text" name="full_name" required><br>
+
+        <!-- Phone -->
+        <label for="phone">Phone:</label>
+        <input type="text" name="phone"><br>
+
+        <!-- Address -->
+        <label for="address">Address:</label>
+        <textarea name="address"></textarea><br>
+
+        <!-- Roll Number -->
+        <label for="roll_number">Roll Number:</label>
+        <input type="text" name="roll_number" required><br>
+
+        <!-- Course -->
+        <label for="course">Course:</label>
+        <input type="text" name="course" required><br>
+
+        <!-- Submit Button -->
+        <button type="submit">Register</button>
+    </form>
+</body>
+</html>

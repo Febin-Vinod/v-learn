@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        
+        h1 {
+            color: #333;
+        }
+        
+        div {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        
+        a {
+            text-decoration: none;
+            color: white;
+            background-color: #007bff;
+            padding: 5px 10px;
+            border-radius: 3px;
+        }
+    </style>
+<head>
+    <title>Browse Courses</title>
+    
+</head>
+<body>
+    <h1>Available Courses</h1>
+    {% for course in courses %}
+    <div>
+        <h2>{{ course.title }}</h2>
+        <p>{{ course.description }}</p>
+        <p>Instructor: {{ course.instructor }}</p>
+        <a href="{% url 'enroll_course' course.id %}">Enroll</a>
+    </div>
+    <hr>
+    {% endfor %}
+</body>
+</html>

@@ -51,9 +51,20 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+# Media files (uploaded by users)
+MEDIA_URL = '/media/'  # URL to access media files (this can remain the same)
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media') 
+
 ROOT_URLCONF = 'vlearn.urls'
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 TEMPLATES = [
     {

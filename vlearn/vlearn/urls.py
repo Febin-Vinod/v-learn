@@ -21,6 +21,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('student_app/', include('student_app.urls')),
+    path('', include('authentication_app.urls')),
 ]
 
 # Serve media files during development

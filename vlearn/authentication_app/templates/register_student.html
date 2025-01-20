@@ -10,36 +10,25 @@
     <form method="post" action="{% url 'register_student' %}">
         {% csrf_token %}
         
-        <!-- Username Field -->
         <label for="username">Username:</label>
-        <input type="text" name="username" required><br>
+    <input type="text" name="username" required>
 
-        <!-- Password Field -->
-        <label for="password">Password:</label>
-        <input type="password" name="password" required><br>
+    <label for="password">Password:</label>
+    <input type="password" name="password" required>
 
-        <!-- Full Name -->
-        <label for="full_name">Full Name:</label>
-        <input type="text" name="full_name" required><br>
+    <label for="full_name">Full Name:</label>
+    <input type="text" name="full_name" required>
 
-        <!-- Phone -->
-        <label for="phone">Phone:</label>
-        <input type="text" name="phone"><br>
+    <label for="school">School:</label>
+    <input type="text" name="school" required>
 
-        <!-- Address -->
-        <label for="address">Address:</label>
-        <textarea name="address"></textarea><br>
+    <label for="phone">Phone:</label>
+    <input type="text" name="phone">
 
-        <!-- Roll Number -->
-        <label for="roll_number">Roll Number:</label>
-        <input type="text" name="roll_number" required><br>
+    <label for="address">Address:</label>
+    <textarea name="address"></textarea>
 
-        <!-- Course -->
-        <label for="course">Course:</label>
-        <input type="text" name="course" required><br>
-
-        <!-- Submit Button -->
-        <button type="submit">Register</button>
+    <button type="submit">Register</button>
     </form>
 </body>
 </html>

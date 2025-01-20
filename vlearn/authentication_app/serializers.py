@@ -27,7 +27,7 @@ class InstructorSerializer(ProfileSerializer):
 class StudentSerializer(ProfileSerializer):
     class Meta:
         model = Student
-        fields = ProfileSerializer.Meta.fields + ['roll_number', 'course']
+        fields = ProfileSerializer.Meta.fields + ['school']
 
 class AdminSerializer(ProfileSerializer):
     class Meta:

@@ -92,7 +92,7 @@ class LoginView(View):
             login(request, user)
 
             if user.is_staff:
-                return redirect(f'{reverse("home")}?message=Welcome Admin {user.username}')
+                return redirect(f'{reverse("browse_courses")}')
 
             profile = getattr(user, 'profile', None)
 

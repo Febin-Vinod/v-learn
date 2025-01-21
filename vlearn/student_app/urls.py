@@ -1,8 +1,8 @@
 from django.urls import path
-from . import views
+from .views import BrowseCoursesView, EnrollCourseView, MyCoursesView
 
 urlpatterns = [
-    path('browse/', views.browse_courses, name='browse_courses'),
-    path('enroll/<int:course_id>/', views.enroll_course, name='enroll_course'),
-    path('my-courses/', views.my_courses, name='my_courses'),
+    path('browse/', BrowseCoursesView.as_view(), name='browse_courses'),
+    path('enroll/<int:course_id>/', EnrollCourseView.as_view(), name='enroll_course'),
+    path('my_courses/', MyCoursesView.as_view(), name='my_courses'),
 ]

@@ -40,9 +40,19 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'student_app',
     'authentication_app',
-    'rest_framework'
+    'rest_framework',
+    'channels',
+    'core',
+    'room'
 ]
 
+WSGI_APPLICATION = 'django_chat.wsgi.application'
+ASGI_APPLICATION = 'django_chat.asgi.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+    }
+}
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -67,6 +77,7 @@ ROOT_URLCONF = 'vlearn.urls'
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+LOGOUT_REDIRECT_URL = '/'
 
 TEMPLATES = [
     {
@@ -133,6 +144,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT=os.path.join(BASE_DIR,'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

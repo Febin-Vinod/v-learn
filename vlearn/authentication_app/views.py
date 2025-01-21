@@ -8,6 +8,7 @@ from django.views import View
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 def generate_jwt_tokens(user):
@@ -45,7 +46,7 @@ class RegisterInstructor(View):
             address=address
         )
 
-        return redirect('login')
+        return redirect('login')  
 
 
 class RegisterStudent(View):
@@ -72,7 +73,7 @@ class RegisterStudent(View):
             address=address
         )
 
-        return redirect('login')
+        return redirect('login') 
 
 
 class LoginView(View):
@@ -105,13 +106,20 @@ class LoginView(View):
         return HttpResponse("Invalid credentials", status=401)
 
 
-class HomePageView(View):
+class HomePageView(LoginRequiredMixin, View):
     def get(self, request):
         message = request.GET.get('message', '')
-        return render(request, 'home.html', {'message': message})
+        profile = request.user.profile
+        context = {
+            'message': message,
+            'profile': profile
+        }
+        return render(request, 'home.html', context)
 
 
 class LogoutView(View):
-    def post(self, request):
+    def get(self, request):  # Handle GET requests too
         logout(request)
-        return redirect('login')
+        return redirect('login')  # This will redirect to authentication_app login
+        
+    

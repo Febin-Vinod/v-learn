@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'instructor'
 ]
 
 MIDDLEWARE = [
@@ -51,11 +53,16 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'vlearn.urls'
 
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [],  # Use this if you have global templates outside app folders.
+        'APP_DIRS': True,  # Enables app-specific templates.
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',

@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -67,8 +69,10 @@ ROOT_URLCONF = 'vlearn.urls'
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-RAZORPAY_KEY_ID = 'rzp_test_ERdVJHPSz3Cx5w'
-RAZORPAY_KEY_SECRET = 'OfJeKlGQWhgmmVTV8U4HYBZS'
+load_dotenv()
+
+RAZORPAY_KEY_ID = os.getenv('RAZORPAY_KEY_ID')
+RAZORPAY_KEY_SECRET = os.getenv('RAZORPAY_KEY_SECRET')
 
 TEMPLATES = [
     {

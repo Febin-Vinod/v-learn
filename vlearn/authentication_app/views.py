@@ -32,11 +32,12 @@ class RegisterInstructor(View):
         bio = request.POST.get('bio')
         phone = request.POST.get('phone')
         address = request.POST.get('address')
+        email = request.POST.get('email')
 
         if not username:
             return HttpResponse("Username is required", status=400)
 
-        user = User.objects.create_user(username=username, password=password)
+        user = User.objects.create_user(username=username, password=password, email=email)
         Instructor.objects.create(
             user=user,
             full_name=full_name,
@@ -46,7 +47,7 @@ class RegisterInstructor(View):
             address=address
         )
 
-        return redirect('login')  
+        return redirect('login1')  
 
 
 class RegisterStudent(View):
@@ -60,11 +61,12 @@ class RegisterStudent(View):
         school = request.POST.get('school')
         phone = request.POST.get('phone')
         address = request.POST.get('address')
+        email = request.POST.get('email')
 
         if not username:
             return HttpResponse("Username is required", status=400)
 
-        user = User.objects.create_user(username=username, password=password)
+        user = User.objects.create_user(username=username, password=password, email=email)
         Student.objects.create(
             user=user,
             full_name=full_name,
@@ -73,7 +75,7 @@ class RegisterStudent(View):
             address=address
         )
 
-        return redirect('login') 
+        return redirect('login1') 
 
 
 class LoginView(View):

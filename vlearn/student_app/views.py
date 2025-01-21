@@ -62,7 +62,26 @@ class CourseDetailView(LoginRequiredMixin, View):
         }
         return render(request, 'course_detail.html', context)
     
+def send_enrollment_email(student, course):
+    """
+    Sends an email to the student when they successfully enroll in a course.
+    """
+    subject = f"Enrollment Successful: {course.title}"
+    message = f"Dear {student.profile.full_name},\n\nYou have successfully enrolled in the course: {course.title}.\n\nBest Regards,\nV-le@rn"
+    recipient_email = student.email
 
+    try:
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,  # Ensure you have this in settings
+            [recipient_email],
+            fail_silently=False,
+        )
+        print("Enrollment email sent successfully")
+        print(f"Sending email to: {student.email}")
+    except Exception as e:
+        print(f"Error sending email: {e}")
 
 client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
@@ -112,29 +131,9 @@ def confirm_payment(request):
                     course = get_object_or_404(Course, id=course_id)
                     Enrollment.objects.create(student=request.user, course=course)
 
-                    # Send enrollment confirmation email
-                    try:
-                        subject = f"Enrollment Confirmation for {course.title}"
-                        message = (
-                            f"Dear {request.user.profile.full_name},\n\n"
-                            f"You have successfully enrolled in the course: {course.title}.\n\n"
-                            f"Course Details:\n"
-                            f"Instructor: {course.instructor}\n"
-                            f"Duration: {course.duration}\n"
-                            f"Price: {course.price}\n\n"
-                            f"Thank you for choosing our platform!\n"
-                        )
-                        recipient_email = request.user.email
+                    # Send enrollment email to the student
+                    send_enrollment_email(request.user, course)
 
-                        send_mail(
-                            subject,
-                            message,
-                            settings.EMAIL_HOST_USER,  # Sender's email
-                            [recipient_email],
-                            fail_silently=False,
-                        )
-                    except Exception as email_error:
-                        print(f"Error sending email: {email_error}")
 
                     return JsonResponse({'success': True, 'message': 'Enrollment successful'})
                 else:

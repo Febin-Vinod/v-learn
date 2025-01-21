@@ -67,7 +67,7 @@ def send_enrollment_email(student, course):
     Sends an email to the student when they successfully enroll in a course.
     """
     subject = f"Enrollment Successful: {course.title}"
-    message = f"Dear {student.profile.full_name},\n\nYou have successfully enrolled in the course: {course.title}.\n\nBest Regards,\nYour Education Platform"
+    message = f"Dear {student.profile.full_name},\n\nYou have successfully enrolled in the course: {course.title}.\n\nBest Regards,\nV-le@rn"
     recipient_email = student.email
 
     try:

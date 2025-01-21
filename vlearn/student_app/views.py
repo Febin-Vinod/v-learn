@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import View
-from .models import Course, Enrollment
+from .models import Enrollment
+from instructor.models import Course
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -8,13 +9,15 @@ import razorpay
 from django.conf import settings
 from django.http import JsonResponse
 import json
+from django.core.mail import send_mail
+
 class BrowseCoursesView(LoginRequiredMixin,View):
     @csrf_exempt
     def get(self, request):
         # Check if the logged-in user has a profile and is a student
         profile = getattr(request.user, 'profile', None)
         if not profile or not profile.isStudent:
-            return redirect('browse_courses')  # Redirect to a home page or a page for unauthorized users
+            return redirect('home')  # Redirect to a home page or a page for unauthorized users
 
         courses = Course.objects.all()
         return render(request, 'browse_courses.html', {'courses': courses})
@@ -108,6 +111,30 @@ def confirm_payment(request):
                     # Enroll the student in the course
                     course = get_object_or_404(Course, id=course_id)
                     Enrollment.objects.create(student=request.user, course=course)
+
+                    # Send enrollment confirmation email
+                    try:
+                        subject = f"Enrollment Confirmation for {course.title}"
+                        message = (
+                            f"Dear {request.user.profile.full_name},\n\n"
+                            f"You have successfully enrolled in the course: {course.title}.\n\n"
+                            f"Course Details:\n"
+                            f"Instructor: {course.instructor}\n"
+                            f"Duration: {course.duration}\n"
+                            f"Price: {course.price}\n\n"
+                            f"Thank you for choosing our platform!\n"
+                        )
+                        recipient_email = request.user.email
+
+                        send_mail(
+                            subject,
+                            message,
+                            settings.EMAIL_HOST_USER,  # Sender's email
+                            [recipient_email],
+                            fail_silently=False,
+                        )
+                    except Exception as email_error:
+                        print(f"Error sending email: {email_error}")
 
                     return JsonResponse({'success': True, 'message': 'Enrollment successful'})
                 else:

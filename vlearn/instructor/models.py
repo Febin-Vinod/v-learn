@@ -8,11 +8,16 @@ class Category(models.Model):
 class Course(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
+    instructor = models.CharField(max_length=200, null=True)
     category = models.ForeignKey(
         'Category',
         on_delete=models.CASCADE,
-        related_name='courses'
+        related_name='courses',
+        null=True,
+        blank=True
     )
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0)  
+    duration = models.CharField(max_length=100, null=True)  
     image = models.ImageField(upload_to='course_images/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -43,7 +45,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'channels',
     'core',
-    'room'
+    'room',
+    'instructor'
+
 ]
 
 WSGI_APPLICATION = 'django_chat.wsgi.application'
@@ -77,7 +81,14 @@ ROOT_URLCONF = 'vlearn.urls'
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
 LOGOUT_REDIRECT_URL = '/'
+
+load_dotenv()
+
+RAZORPAY_KEY_ID = os.getenv('RAZORPAY_KEY_ID')
+RAZORPAY_KEY_SECRET = os.getenv('RAZORPAY_KEY_SECRET')
+
 
 TEMPLATES = [
     {
@@ -150,3 +161,10 @@ STATIC_ROOT=os.path.join(BASE_DIR,'staticfiles')
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # For Gmail
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'febnn25@gmail.com'
+EMAIL_HOST_PASSWORD = 'gork vquh zyte ezxc'

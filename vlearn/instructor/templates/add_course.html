@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Course</title>
+    <script>
+        function toggleNewCategoryField() {
+            const categoryField = document.getElementById('id_category');
+            const newCategoryField = document.getElementById('new-category-field');
+
+            // Show new category field if "Others" is selected
+            if (categoryField.value === 'others') {
+                newCategoryField.style.display = 'block';
+            } else {
+                newCategoryField.style.display = 'none';
+                document.getElementById('id_new_category').value = ''; // Clear the field if hidden
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            toggleNewCategoryField(); // Initialize visibility on page load
+            document.getElementById('id_category').addEventListener('change', toggleNewCategoryField);
+        });
+
+        // Function to dynamically add new video form
+        let videoCount = {{ video_formset.management_form.TOTAL_FORMS.value|default:"1" }}; 
+
+        function addVideoForm() {
+            videoCount++;
+
+            const formContainer = document.getElementById('video-form-container');
+            const managementForm = document.getElementById('id_video_form-TOTAL_FORMS');
+
+            // Increment the total forms count
+            managementForm.value = videoCount;
+
+            const newForm = document.createElement('div');
+            newForm.innerHTML = `
+                <h3>Module ${videoCount}</h3>
+                <label for="id_video_form-${videoCount}-title">Video Title:</label>
+                <input type="text" name="video_form-${videoCount}-title" id="id_video_form-${videoCount}-title">
+                <label for="id_video_form-${videoCount}-video_file">Video File:</label>
+                <input type="file" name="video_form-${videoCount}-video_file" id="id_video_form-${videoCount}-video_file">
+            `;
+            formContainer.appendChild(newForm);
+        }
+    </script>
+</head>
+<body>
+    <h1>Add a New Course</h1>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Course Form Fields -->
+        <h2>Course Information</h2>
+        {{ course_form.as_p }}
+
+        <!-- New Category Input Field -->
+        <div id="new-category-field" style="display: none;">
+            <label for="id_new_category">New Category:</label>
+            <input type="text" id="id_new_category" name="new_category">
+        </div>
+
+        <!-- Video Form Section -->
+        <h2>Video Information</h2>
+        <div id="video-form-container">
+            <!-- Management form to handle formset -->
+            {{ video_formset.management_form }}
+            
+            <!-- Render the video forms -->
+            {% for form in video_formset %}
+                <div>
+                    {{ form.as_p }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Button to add more video forms -->
+        <button type="button" onclick="addVideoForm()">Add Video</button>
+
+        <button type="submit">Add Course</button>
+    </form>
+
+    <a href="{% url 'my_courses' %}">Back to My Courses</a>
+</body>
+</html>

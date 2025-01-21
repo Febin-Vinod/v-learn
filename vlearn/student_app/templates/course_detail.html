@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Detail</title>
+    <style>
+        /* Global Styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f7fc;
+            color: #333;
+        }
+
+        /* Container */
+        .course-detail-container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Header Section */
+        .course-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .course-image {
+            width: 250px;
+            height: 150px;
+            border-radius: 8px;
+            object-fit: cover;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .course-title {
+            font-size: 2rem;
+            color: #333;
+        }
+
+        .course-meta {
+            font-size: 1rem;
+            color: #777;
+        }
+
+        /* Course Description Section */
+        .course-description {
+            margin-bottom: 20px;
+        }
+
+        .course-description h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .course-description p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #444;
+        }
+
+        /* Action Section */
+        .action-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+        }
+
+        .price {
+            font-size: 1.5rem;
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .enroll-btn {
+            background: #27ae60;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .enroll-btn:hover {
+            background: #2ecc71;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: #3498db;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    {% if user.is_authenticated %}
+        {% if not user.profile.isStudent %}
+            <div style="text-align: center; margin-top: 50px;">
+                <p>You need to be a student to view this page.</p>
+                <a href="{% url 'home' %}" class="back-link">Go back to home</a>
+            </div>
+        {% else %}
+            <div class="course-detail-container">
+                <div class="course-header">
+                    <img src="{{ course.image.url }}" alt="{{ course.title }} thumbnail" class="course-image">
+                    <div>
+                        <h1 class="course-title">{{ course.title }}</h1>
+                        <p class="course-meta">Instructor: {{ course.instructor }}</p>
+                        <p class="course-meta">Duration: {{ course.duration }}</p>
+                    </div>
+                </div>
+
+                <div class="course-description">
+                    <h2>About this Course</h2>
+                    <p>{{ course.description }}</p>
+                </div>
+
+                <div class="action-container">
+                    <p class="price">Price:{{ course.price }}</p>
+                    {% if is_enrolled %}
+                        <p>You are already enrolled in this course!</p>
+                    {% else %}
+                        <form method="post" action="{% url 'course_payment' course.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="enroll-btn">Enroll Now</button>
+                        </form>
+                    {% endif %}
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <a href="{% url 'browse_courses' %}" class="back-link">Back to Browse Courses</a>
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <div style="text-align: center; margin-top: 50px;">
+            <p>You need to be logged in to view course details.</p>
+            <a href="{% url 'login' %}" class="enroll-btn">Login</a>
+        </div>
+    {% endif %}
+</body>
+</html>

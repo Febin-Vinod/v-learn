@@ -21,9 +21,10 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('courses/', include('instructor.urls')),  # Include URLs from lms_app
+    path('student_app/', include('student_app.urls')),
+    path('', include('authentication_app.urls')),
 ]
 
 # Serve media files during development
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Payment</title>
+</head>
+<body>
+    <h1>Pay for {{ course.title }}</h1>
+
+    <form method="POST" id="payment-form">
+        {% csrf_token %}
+        <button id="pay-button">Pay with Razorpay</button>
+    </form>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        var options = {
+            "key": "{{ razorpay_key }}", // Razorpay Key ID
+            "amount": "{{ order_amount }}", // Amount in paise
+            "currency": "INR",
+            "name": "{{ course.title }}",
+            "description": "Payment for course",
+            "handler": function (response) {
+                // Send the payment ID and other details to your server to handle the payment confirmation
+                var payment_id = response.razorpay_payment_id;
+                var course_id = "{{ course.id }}";
+                
+                // Make an AJAX request to confirm the payment on the server
+                fetch("{% url 'confirm_payment' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    body: JSON.stringify({
+                        payment_id: payment_id,
+                        course_id: course_id
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    if (data.success) {
+                        window.location.href = "{% url 'payment_success' course.id %}";
+                    } else {
+                        alert("Payment failed"+ data.message);
+                    }
+                });
+            },
+            "prefill": {
+                "name": "{{ user.first_name }} {{ user.last_name }}",
+                "email": "{{ user.email }}",
+                "contact": "{{ user.profile.phone }}"
+            },
+            "theme": {
+                "color": "#F37254"
+            }
+        };
+
+        var rzp1 = new Razorpay(options);
+
+        document.getElementById('pay-button').onclick = function (e) {
+            e.preventDefault();
+            rzp1.open();
+        }
+    </script>
+</body>
+</html>

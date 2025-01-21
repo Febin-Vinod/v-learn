@@ -92,12 +92,12 @@ class LoginView(View):
             login(request, user)
 
             if user.is_staff:
-                return redirect(f'{reverse("home")}?message=Welcome Admin {user.username}')
+                return redirect(f'{reverse("home")}')
 
             profile = getattr(user, 'profile', None)
 
             if profile and profile.isStudent:
-                return redirect(f'{reverse("home")}?message=Welcome Student {profile.full_name}')
+                return redirect(f'{reverse("browse_courses")}?message=Welcome Student {profile.full_name}')
             elif profile and profile.isInstructor:
                 return redirect(f'{reverse("home")}?message=Welcome Instructor {profile.full_name}')
             else:

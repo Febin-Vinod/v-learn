@@ -67,6 +67,8 @@ ROOT_URLCONF = 'vlearn.urls'
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+RAZORPAY_KEY_ID = 'rzp_test_ERdVJHPSz3Cx5w'
+RAZORPAY_KEY_SECRET = 'OfJeKlGQWhgmmVTV8U4HYBZS'
 
 TEMPLATES = [
     {

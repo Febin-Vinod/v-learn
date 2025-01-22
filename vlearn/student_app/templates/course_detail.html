@@ -206,53 +206,11 @@
 
 <body>
     {% if user.is_authenticated %}
-
-        {% if not user.profile.isStudent %}
-            <div style="text-align: center; margin-top: 50px;">
-                <p>You need to be a student to view this page.</p>
-                <a href="{% url 'home' %}" class="back-link">Go back to home</a>
-            </div>
-        {% else %}
-            <div class="course-detail-container">
-                <div class="course-header">
-                    <img src="{{ course.image.url }}" alt="{{ course.title }} thumbnail" class="course-image">
-                    <div>
-                        <h1 class="course-title">{{ course.title }}</h1>
-                        <p class="course-meta">Instructor: {{ course.instructor }}</p>
-                        <p class="course-meta">Duration: {{ course.duration }}</p>
-                    </div>
-                </div>
-
-                <div class="course-description">
-                    <h2>About this Course</h2>
-                    <p>{{ course.description }}</p>
-                </div>
-
-                <div class="action-container">
-                    <p class="price">Price:{{ course.price }}</p>
-                    {% if is_enrolled %}
-                        <p>You are already enrolled in this course!</p>
-                        <a href="{% url 'certificates_app:generate_certificate' enrollment.id %}" class="btn btn-success">View Certificate</a>
-                    {% else %}
-                        <form method="post" action="{% url 'course_payment' course.id %}">
-                            {% csrf_token %}
-                            <button type="submit" class="enroll-btn">Enroll Now</button>
-                        </form>
-                    {% endif %}
-                </div>
-
-                <div style="margin-top: 20px;">
-                    <a href="{% url 'browse_courses' %}" class="back-link">Back to Browse Courses</a>
-                </div>
-            </div>
-        {% endif %}
-
     {% if not user.profile.isStudent %}
     <div style="text-align: center; margin-top: 50px;">
         <p>You need to be a student to view this page.</p>
         <a href="{% url 'home' %}" class="back-link">Go back to home</a>
     </div>
-
     {% else %}
     <div class="course-detail-container">
         <div class="course-header">

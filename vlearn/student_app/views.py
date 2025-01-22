@@ -10,6 +10,9 @@ from django.conf import settings
 from django.http import JsonResponse
 import json
 from django.core.mail import send_mail
+from django.utils.text import slugify
+from room.models import Room
+
 
 class BrowseCoursesView(LoginRequiredMixin,View):
     @csrf_exempt
@@ -56,12 +59,32 @@ class CourseDetailView(LoginRequiredMixin, View):
         enrollment = Enrollment.objects.filter(student=request.user, course=course).first()
         is_enrolled = enrollment is not None
 
+        if is_enrolled:
+            instructor = course.instructor
+            slug = slugify(course.title)
+            room, created = Room.objects.get_or_create(
+                slug=slug,
+                defaults={
+                    'name': f"Chatroom for {course.title}",
+                    'creator':instructor
+                }
+            )
+            room.participants.add(profile)
+        else:
+            room = None
+
+        # Get the videos only if the student is enrolled
+        videos = course.videos.all() if is_enrolled else []
+
         context = {
             'course': course,
             'is_enrolled': is_enrolled,
             'enrollment': enrollment,  # Add this line
+            'videos': videos, 
+            'room': room,
         }
         return render(request, 'course_detail.html', context)
+
     
 def send_enrollment_email(student, course):
     """

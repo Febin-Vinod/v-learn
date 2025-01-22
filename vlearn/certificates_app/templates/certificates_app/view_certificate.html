@@ -1,0 +1,116 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Course Certificate</title>
+    <style>
+        @page {
+            size: letter landscape;
+            margin: 2cm;
+        }
+        body {
+            font-family: 'Georgia', serif;
+            background-color: #121212;
+            margin: 0;
+            padding: 0;
+        }
+        .certificate-container {
+            width: 900px;
+            margin: 50px auto;
+            padding: 40px;
+            border: 10px solid #1DB954;
+            border-radius: 20px;
+            background: linear-gradient(145deg, #1e1e1e, #2c2c2c);
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6);
+            color: #f5f5f5;
+        }
+        .certificate-header {
+            font-size: 48px;
+            font-weight: bold;
+            color: #1DB954;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            border-bottom: 2px solid #1DB954;
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+        .certificate-body {
+            font-size: 24px;
+            color: #cccccc;
+            line-height: 1.8;
+            margin: 30px 0;
+        }
+        .certificate-body strong {
+            font-size: 28px;
+            color: #f5f5f5;
+        }
+        .certificate-footer {
+            margin-top: 30px;
+            font-size: 18px;
+            color: #aaaaaa;
+        }
+        .certificate-footer strong {
+            color: #1DB954;
+        }
+        .certificate-seal {
+            margin-top: 20px;
+        }
+        .certificate-seal img {
+            width: 100px;
+            height: auto;
+            opacity: 0.85;
+        }
+        /* Web-only styles */
+        @media screen {
+            .certificate-container {
+                border-image: linear-gradient(to right, #1DB954, #23e06b) 1;
+            }
+            .download-btn {
+                display: inline-block;
+                margin-top: 20px;
+                padding: 12px 30px;
+                font-size: 18px;
+                background-color: #1DB954;
+                color: #ffffff;
+                text-decoration: none;
+                border-radius: 8px;
+                font-weight: bold;
+                transition: background-color 0.3s ease;
+            }
+            .download-btn:hover {
+                background-color: #23e06b;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="certificate-container">
+        <span class="certificate-header">Certificate of Completion</span>
+        <span class="certificate-body">
+            <br><br>
+            This is to certify that<br>
+            <strong>{{ student_name }}</strong><br>
+            has successfully completed the course<br>
+            <strong>{{ course_name }}</strong>
+        </span>
+        <span class="certificate-footer">
+            <br><br>
+            Issue Date: <strong>{{ issue_date }}</strong><br>
+            Certificate ID: <strong>{{ certificate_id }}</strong>
+        </span>
+        <span class="certificate-seal">
+            <br><br>
+            <img src="{% static 'images/seal.png' %}" alt="Certificate Seal">
+        </span>
+    </div>
+    {% if not pdf_download %}
+    <div style="text-align: center;">
+        <a href="{% url 'certificates_app:download_certificate' enrollment_id=certificate.enrollment.id %}" class="download-btn">
+            Download PDF Certificate
+        </a>
+    </div>
+    {% endif %}
+</body>
+</html>

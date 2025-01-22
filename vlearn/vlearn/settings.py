@@ -46,9 +46,17 @@ INSTALLED_APPS = [
     'channels',
     'core',
     'room',
-    'instructor'
+    'instructor',
+    'certificates_app'
 
 ]
+STATIC_URL = '/static/'
+
+# Additional locations of static files
+STATICFILES_DIRS = [
+    BASE_DIR / "static",  # Or os.path.join(BASE_DIR, "static") for older versions of Django
+]
+
 
 WSGI_APPLICATION = 'django_chat.wsgi.application'
 ASGI_APPLICATION = 'django_chat.asgi.application'

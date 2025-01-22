@@ -167,7 +167,7 @@
             <div class="course-container">
                 {% for course in courses %}
                     <div class="course-card">
-                        <img src="{{ course.thumbnail.url }}" alt="{{ course.title }} thumbnail">
+                        <img src="{{ course.image.url }}" alt="{{ course.title }} thumbnail">
                         <h2>{{ course.title }}</h2>
                         <p>{{ course.description|slice:":150" }}...</p>
                         <p><strong>Instructor:</strong> {{ course.instructor }}</p>

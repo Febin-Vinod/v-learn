@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import View
 from .models import Enrollment
-from instructor.models import Course
+from instructor.models import Course, Category
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -12,6 +12,7 @@ import json
 from django.core.mail import send_mail
 from django.utils.text import slugify
 from room.models import Room
+from django.db.models import Q
 
 
 class BrowseCoursesView(LoginRequiredMixin,View):
@@ -21,9 +22,26 @@ class BrowseCoursesView(LoginRequiredMixin,View):
         profile = getattr(request.user, 'profile', None)
         if not profile or not profile.isStudent:
             return redirect('home')  # Redirect to a home page or a page for unauthorized users
-
+        
+        # Get all courses initially
         courses = Course.objects.all()
-        return render(request, 'browse_courses.html', {'courses': courses})
+
+
+        # Filter by category if selected
+        category_id = request.GET.get('category')
+        if category_id:
+            courses = courses.filter(category_id=category_id)
+
+        # Search by course name or instructor name
+        search_query = request.GET.get('search', '').strip()
+        if search_query:
+            courses = courses.filter(
+                Q(title__icontains=search_query) | Q(instructor__full_name__icontains=search_query)
+            )
+
+        categories = Category.objects.all()  # Pass categories for the dropdown
+
+        return render(request, 'browse_courses.html', {'courses': courses, 'categories': categories})
 
 
 class StudentDashboardView(LoginRequiredMixin, View):

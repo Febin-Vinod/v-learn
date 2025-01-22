@@ -5,7 +5,7 @@ from django.forms import modelformset_factory
 class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
-        fields = ['title', 'description', 'category', 'image']
+        fields = ['title', 'description', 'category', 'image','duration','price']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

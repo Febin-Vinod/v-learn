@@ -108,8 +108,13 @@
         <h2>Manage Students and Courses</h2>
 
         <div class="button-container">
+
+            <button onclick="window.location.href='{% url 'student_management' %}'">Student Management</button>
+            <button onclick="window.location.href='{% url 'instructor_management' %}'">Course Management</button>
+            <button onclick="window.location.href='{% url 'manage_chat_rooms' %}'">Manage Chat Rooms</button>
             <button onclick="window.location.href='{% url 'student_management' %}'">Manage Students</button>
             <button onclick="window.location.href='{% url 'instructor_management' %}'">Manage Courses</button>
+
         </div>
 
         <!-- Logout Button -->

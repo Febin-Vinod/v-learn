@@ -9,4 +9,5 @@ urlpatterns = [
     path('dashboard/', views.instructor_dashboard, name='instructor_dashboard'),
     path('student_management/', views.student_management, name='student_management'),
     path('instructor_management/', views.instructor_management, name='instructor_management'),
+    path('manage-chat-rooms/', views.manage_chat_rooms, name='manage_chat_rooms'),
 ]

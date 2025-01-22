@@ -1,5 +1,6 @@
 from django.db import models
 from authentication_app.models import Instructor
+
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
@@ -8,7 +9,12 @@ class Category(models.Model):
 class Course(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
-    instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE, related_name='courses', null=True)
+    instructor = models.ForeignKey(
+        Instructor,  # Establish a relationship with the Instructor model
+        on_delete=models.CASCADE,
+        related_name='courses',
+        null= True  # Allows reverse query: instructor.courses.all()
+    )
     category = models.ForeignKey(
         'Category',
         on_delete=models.CASCADE,

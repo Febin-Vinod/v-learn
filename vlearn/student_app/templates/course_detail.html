@@ -137,6 +137,7 @@
                     <p class="price">Price:{{ course.price }}</p>
                     {% if is_enrolled %}
                         <p>You are already enrolled in this course!</p>
+                        <a href="{% url 'certificates_app:generate_certificate' enrollment.id %}" class="btn btn-success">View Certificate</a>
                     {% else %}
                         <form method="post" action="{% url 'course_payment' course.id %}">
                             {% csrf_token %}

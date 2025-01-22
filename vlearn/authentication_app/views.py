@@ -8,6 +8,7 @@ from django.views import View
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 def generate_jwt_tokens(user):
@@ -31,11 +32,12 @@ class RegisterInstructor(View):
         bio = request.POST.get('bio')
         phone = request.POST.get('phone')
         address = request.POST.get('address')
+        email = request.POST.get('email')
 
         if not username:
             return HttpResponse("Username is required", status=400)
 
-        user = User.objects.create_user(username=username, password=password)
+        user = User.objects.create_user(username=username, password=password, email=email)
         Instructor.objects.create(
             user=user,
             full_name=full_name,
@@ -45,7 +47,7 @@ class RegisterInstructor(View):
             address=address
         )
 
-        return redirect('login')
+        return redirect('login1')  
 
 
 class RegisterStudent(View):
@@ -59,11 +61,12 @@ class RegisterStudent(View):
         school = request.POST.get('school')
         phone = request.POST.get('phone')
         address = request.POST.get('address')
+        email = request.POST.get('email')
 
         if not username:
             return HttpResponse("Username is required", status=400)
 
-        user = User.objects.create_user(username=username, password=password)
+        user = User.objects.create_user(username=username, password=password, email=email)
         Student.objects.create(
             user=user,
             full_name=full_name,
@@ -72,7 +75,7 @@ class RegisterStudent(View):
             address=address
         )
 
-        return redirect('login')
+        return redirect('login1') 
 
 
 class LoginView(View):
@@ -99,19 +102,26 @@ class LoginView(View):
             if profile and profile.isStudent:
                 return redirect(f'{reverse("browse_courses")}?message=Welcome Student {profile.full_name}')
             elif profile and profile.isInstructor:
-                return redirect(f'{reverse("home")}?message=Welcome Instructor {profile.full_name}')
+                return redirect(f'{reverse("instructor_dashboard")}?message=Welcome Instructor {profile.full_name}')
             else:
                 return redirect(f'{reverse("home")}?message=Welcome {user.username}')
         return HttpResponse("Invalid credentials", status=401)
 
 
-class HomePageView(View):
+class HomePageView(LoginRequiredMixin, View):
     def get(self, request):
         message = request.GET.get('message', '')
-        return render(request, 'home.html', {'message': message})
+        profile = request.user.profile
+        context = {
+            'message': message,
+            'profile': profile
+        }
+        return render(request, 'home.html', context)
 
 
 class LogoutView(View):
-    def post(self, request):
+    def get(self, request):  # Handle GET requests too
         logout(request)
-        return redirect('login')
+        return redirect('login')  # This will redirect to authentication_app login
+        
+    

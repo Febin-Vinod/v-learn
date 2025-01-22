@@ -9,6 +9,7 @@ _pycache_/
 # Ignore virtual environment directory
 env/
 venv/
+menv/
 
 # Ignore SQLite database
 *.sqlite3

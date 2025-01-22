@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import View
-from .models import Course, Enrollment
+from .models import Enrollment
+from instructor.models import Course
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -8,13 +9,18 @@ import razorpay
 from django.conf import settings
 from django.http import JsonResponse
 import json
+from django.core.mail import send_mail
+from django.utils.text import slugify
+from room.models import Room
+
+
 class BrowseCoursesView(LoginRequiredMixin,View):
     @csrf_exempt
     def get(self, request):
         # Check if the logged-in user has a profile and is a student
         profile = getattr(request.user, 'profile', None)
         if not profile or not profile.isStudent:
-            return redirect('browse_courses')  # Redirect to a home page or a page for unauthorized users
+            return redirect('home')  # Redirect to a home page or a page for unauthorized users
 
         courses = Course.objects.all()
         return render(request, 'browse_courses.html', {'courses': courses})
@@ -53,13 +59,52 @@ class CourseDetailView(LoginRequiredMixin, View):
         is_enrolled = Enrollment.objects.filter(student=request.user, course=course).exists()
 
 
+        if is_enrolled:
+            instructor = course.instructor
+            slug = slugify(course.title)
+            room, created = Room.objects.get_or_create(
+                slug=slug,
+                defaults={
+                    'name': f"Chatroom for {course.title}",
+                    'creator':instructor
+                }
+            )
+            room.participants.add(profile)
+        else:
+            room = None
+
+        # Get the videos only if the student is enrolled
+        videos = course.videos.all() if is_enrolled else []
+
         context = {
             'course': course,
             'is_enrolled': is_enrolled,
+            'videos': videos, 
+            'room': room,
         }
         return render(request, 'course_detail.html', context)
-    
 
+    
+def send_enrollment_email(student, course):
+    """
+    Sends an email to the student when they successfully enroll in a course.
+    """
+    subject = f"Enrollment Successful: {course.title}"
+    message = f"Dear {student.profile.full_name},\n\nYou have successfully enrolled in the course: {course.title}.\n\nBest Regards,\nV-le@rn"
+    recipient_email = student.email
+
+    try:
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,  # Ensure you have this in settings
+            [recipient_email],
+            fail_silently=False,
+        )
+        print("Enrollment email sent successfully")
+        print(f"Sending email to: {student.email}")
+    except Exception as e:
+        print(f"Error sending email: {e}")
 
 client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
@@ -108,6 +153,10 @@ def confirm_payment(request):
                     # Enroll the student in the course
                     course = get_object_or_404(Course, id=course_id)
                     Enrollment.objects.create(student=request.user, course=course)
+
+                    # Send enrollment email to the student
+                    send_enrollment_email(request.user, course)
+
 
                     return JsonResponse({'success': True, 'message': 'Enrollment successful'})
                 else:

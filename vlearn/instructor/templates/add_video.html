@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Video to {{ course.title }}</title>
+</head>
+<body>
+    <h1>Add Video to Course: {{ course.title }}</h1>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Video Formset Fields -->
+        <h2>Video Information</h2>
+        {{ formset.management_form }}
+        
+        {% for form in formset %}
+            <div>
+                {{ form.as_p }}
+            </div>
+        {% endfor %}
+        
+        <button type="submit">Add Video</button>
+    </form>
+
+    <a href="{% url 'my_courses' %}">Back to My Courses</a>
+</body>
+</html>

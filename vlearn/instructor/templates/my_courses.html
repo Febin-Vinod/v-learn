@@ -6,41 +6,40 @@
 </head>
 <body>
     <h1>My Courses</h1>
-    
-    {% if courses %}
-        <ul>
-            {% for course in courses %}
-                <li>
-                    <h2>{{ course.title }}</h2>
-                    <p>{{ course.description }}</p>
-                    <p><strong>Category:</strong> {{ course.category }}</p>
-                    {% if course.image %}
-                        <img src="{{ course.image.url }}" alt="{{ course.title }}" width="200">
-                    {% endif %}
-                    <p>Created on: {{ course.created_at }}</p>
+    <ul>
+        {% for course in courses %}
+            <li>
+                <h2>{{ course.title }}</h2> <!-- Display course title -->
+                <p><strong>Description:</strong> {{ course.description }}</p>
+                <p><strong>Category:</strong> {{ course.category.name }}</p>
+                <p><strong>Created At:</strong> {{ course.created_at }}</p>
+                {% if course.image %}
+                    <p><strong>Image:</strong></p>
+                    <img src="{{ course.image.url }}" alt="{{ course.title }}" style="max-width: 200px;">
+                {% endif %}
+                
+                <!-- Button to add a video to this course -->
+                <a href="{% url 'add_video' course.id %}"><button>Add Video</button></a>
 
-                    <!-- Display Videos for each course -->
-                    <h3>Videos:</h3>
-                    {% if course.videos.all %}
-                        <ul>
-                            {% for video in course.videos.all %}
-                                <li>
-                                    <strong>{{ video.chapter_name }}</strong><br>
-                                    <video width="320" height="240" controls>
-                                        <source src="{{ video.video_file.url }}" type="video/mp4">
-                                        Your browser does not support the video tag.
-                                    </video>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p>No videos available for this course.</p>
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>You have not added any courses yet.</p>
-    {% endif %}
+                <h3>Videos:</h3>
+                {% if course.videos.exists %}
+                    <ul>
+                        {% for video in course.videos.all %}
+                            <li>
+                                <p><strong>Video Title:</strong> {{ video.title_1 }}</p> <!-- Display video title -->
+                                <p><strong>Uploaded At:</strong> {{ video.created_at }}</p>
+                                <video width="320" height="240" controls>
+                                    <source src="{{ video.video_file.url }}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No videos added for this course yet.</p>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
 </body>
 </html>

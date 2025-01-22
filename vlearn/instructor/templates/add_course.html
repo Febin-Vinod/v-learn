@@ -8,7 +8,7 @@
             const categoryField = document.getElementById('id_category');
             const newCategoryField = document.getElementById('new-category-field');
 
-            // Show new category field if "Others" is selected
+            // Check if the selected value is "others"
             if (categoryField.value === 'others') {
                 newCategoryField.style.display = 'block';
             } else {
@@ -21,29 +21,6 @@
             toggleNewCategoryField(); // Initialize visibility on page load
             document.getElementById('id_category').addEventListener('change', toggleNewCategoryField);
         });
-
-        // Function to dynamically add new video form
-        let videoCount = {{ video_formset.management_form.TOTAL_FORMS.value|default:"1" }}; 
-
-        function addVideoForm() {
-            videoCount++;
-
-            const formContainer = document.getElementById('video-form-container');
-            const managementForm = document.getElementById('id_video_form-TOTAL_FORMS');
-
-            // Increment the total forms count
-            managementForm.value = videoCount;
-
-            const newForm = document.createElement('div');
-            newForm.innerHTML = `
-                <h3>Module ${videoCount}</h3>
-                <label for="id_video_form-${videoCount}-title">Video Title:</label>
-                <input type="text" name="video_form-${videoCount}-title" id="id_video_form-${videoCount}-title">
-                <label for="id_video_form-${videoCount}-video_file">Video File:</label>
-                <input type="file" name="video_form-${videoCount}-video_file" id="id_video_form-${videoCount}-video_file">
-            `;
-            formContainer.appendChild(newForm);
-        }
     </script>
 </head>
 <body>
@@ -54,30 +31,21 @@
         <!-- Course Form Fields -->
         <h2>Course Information</h2>
         {{ course_form.as_p }}
-
+        
         <!-- New Category Input Field -->
         <div id="new-category-field" style="display: none;">
             <label for="id_new_category">New Category:</label>
             <input type="text" id="id_new_category" name="new_category">
         </div>
 
-        <!-- Video Form Section -->
+        <!-- Single Video Form Section -->
         <h2>Video Information</h2>
         <div id="video-form-container">
-            <!-- Management form to handle formset -->
-            {{ video_formset.management_form }}
-            
-            <!-- Render the video forms -->
-            {% for form in video_formset %}
-                <div>
-                    {{ form.as_p }}
-                </div>
-            {% endfor %}
+            <h3>Video</h3>
+            {{ video_form.as_p }}
         </div>
 
-        <!-- Button to add more video forms -->
-        <button type="button" onclick="addVideoForm()">Add Video</button>
-
+        <!-- Submit Button -->
         <button type="submit">Add Course</button>
     </form>
 

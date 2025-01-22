@@ -12,150 +12,109 @@
         }
 
         body {
-            background-color: #1c1c1c;
-            font-family: 'Roboto', sans-serif;
-            color: #fff;
-            line-height: 1.6;
-        }
-
-        h1 {
-            font-size: 3rem;
-            color: #00ffcc;
-            text-align: center;
-            margin-bottom: 20px;
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
         }
 
         .container {
-            max-width: 1200px;
-            margin: 50px auto;
+            width: 90%;
+            max-width: 1100px;
+            margin: 40px auto;
             padding: 20px;
-            background: linear-gradient(135deg, #141e30, #243b55);
-            border-radius: 20px;
-            box-shadow: 0 4px 30px rgba(0, 255, 204, 0.2);
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .container h2 {
-            font-size: 2.5rem;
-            color: #00ffcc;
-            margin-bottom: 30px;
+        h1 {
             text-align: center;
-            letter-spacing: 2px;
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 1.8rem;
+            color: #555;
+            margin-bottom: 40px;
         }
 
         .button-container {
             display: flex;
-            justify-content: space-evenly;
+            justify-content: space-around;
             gap: 20px;
+            margin-bottom: 40px;
         }
 
         .button-container button {
-            position: relative;
-            padding: 15px 30px;
+            padding: 15px 25px;
             font-size: 1.2rem;
-            background-color: #111;
+            background-color: #007bff;
             color: #fff;
-            border: 2px solid #00ffcc;
-            border-radius: 30px;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
             transition: all 0.3s ease-in-out;
             width: 250px;
-            text-transform: uppercase;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
-
-        .button-container button::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 100%;
-            height: 100%;
-            background-color: #00ffcc;
-            opacity: 0.2;
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            animation: pulsate 2s infinite;
         }
 
         .button-container button:hover {
-            background-color: #00ffcc;
-            color: #111;
+            background-color: #0056b3;
             transform: scale(1.05);
         }
 
-        .button-container button:focus {
-            outline: none;
+        .logout-container {
+            text-align: center;
+            margin-top: 30px;
         }
 
-        @keyframes pulsate {
-            0% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 0.2;
-            }
-            50% {
-                transform: translate(-50%, -50%) scale(1.2);
-                opacity: 0.3;
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 0.2;
-            }
+        .logout-btn {
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            background-color: #e60000;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 250px;
+        }
+
+        .logout-btn:hover {
+            background-color: #c60000;
         }
 
         .footer {
             text-align: center;
-            margin-top: 40px;
+            margin-top: 60px;
             font-size: 1rem;
-            color: #999;
+            color: #777;
         }
 
         .footer a {
-            color: #00ffcc;
+            color: #007bff;
             text-decoration: none;
         }
 
         .footer a:hover {
             text-decoration: underline;
         }
-
-        /* Custom style for logout button */
-        .logout-btn {
-            padding: 10px 20px;
-            font-size: 1.2rem;
-            background-color: #ff4d4d;
-            color: #fff;
-            border: 2px solid #ff4d4d;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: all 0.3s ease-in-out;
-            width: 250px;
-            text-transform: uppercase;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
-
-        .logout-btn:hover {
-            background-color: #e60000;
-            border-color: #e60000;
-        }
-
-        /* Centering the logout button */
-        .logout-container {
-            text-align: center;
-            margin-top: 30px;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Instructor Dashboard</h1>
-        <h2>Manage Students and Instructors</h2>
+        <h2>Manage Students and Courses</h2>
 
         <div class="button-container">
+
             <button onclick="window.location.href='{% url 'student_management' %}'">Student Management</button>
             <button onclick="window.location.href='{% url 'instructor_management' %}'">Course Management</button>
             <button onclick="window.location.href='{% url 'manage_chat_rooms' %}'">Manage Chat Rooms</button>
+            <button onclick="window.location.href='{% url 'student_management' %}'">Manage Students</button>
+            <button onclick="window.location.href='{% url 'instructor_management' %}'">Manage Courses</button>
+
         </div>
 
         <!-- Logout Button -->

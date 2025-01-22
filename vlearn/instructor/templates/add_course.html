@@ -3,6 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <title>Add Course</title>
+    <style>
+        /* General Reset */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+
+        /* Header */
+        h1 {
+            text-align: center;
+            color: #343a40;
+            margin-top: 20px;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #495057;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-bottom: 10px;
+            color: #6c757d;
+        }
+
+        /* Form Container */
+        form {
+            max-width: 800px;
+            margin: 30px auto;
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px 30px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Labels and Inputs */
+        form label {
+            font-weight: 600;
+            color: #495057;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        form input, form select, form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            background: #ffffff;
+            font-size: 1rem;
+            color: #495057;
+        }
+
+        form input:focus, form select:focus, form textarea:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        /* Submit Button */
+        form button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            background: #007bff;
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        form button:hover {
+            background-color: #0056b3;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* New Category Field */
+        #new-category-field {
+            display: none;
+        }
+
+        /* Link */
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1rem;
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        /* Video Section */
+        #video-form-container {
+            margin-top: 20px;
+            background: #f8f9fa;
+            padding: 15px;
+            border: 1px dashed #ced4da;
+            border-radius: 5px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            form {
+                padding: 15px 20px;
+            }
+
+            form button {
+                font-size: 0.9rem;
+            }
+
+            a {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
     <script>
         function toggleNewCategoryField() {
             const categoryField = document.getElementById('id_category');
@@ -33,7 +165,7 @@
         {{ course_form.as_p }}
 
         <!-- New Category Input Field -->
-        <div id="new-category-field" style="display: none;">
+        <div id="new-category-field">
             <label for="id_new_category">New Category:</label>
             <input type="text" id="id_new_category" name="new_category">
         </div>
@@ -49,6 +181,6 @@
         <button type="submit">Add Course</button>
     </form>
 
-    <a href="{% url 'my_courses' %}">Back to My Courses</a>
+    <a href="{% url 'my_courses' %}">View My Courses</a>
 </body>
 </html>

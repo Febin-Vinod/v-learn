@@ -3,37 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <title>My Courses</title>
+    <style>
+        /* General Reset */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+
+        /* Header */
+        h1 {
+            text-align: center;
+            color: #343a40;
+            margin-top: 30px;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        /* Create Course Button */
+        .create-course-button {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 10px 20px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none; /* Removes underline */
+            text-align: center; /* Centers the text */
+        }
+
+        .create-course-button:hover {
+            background-color: #218838;
+        }
+
+        /* Courses List */
+        ul {
+            list-style: none;
+            padding: 0;
+            max-width: 1200px;
+            margin: 30px auto;
+        }
+
+        li {
+            background: #ffffff;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 1rem;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+
+        strong {
+            font-weight: 600;
+        }
+
+        /* Course Image */
+        img {
+            margin-top: 10px;
+            border-radius: 8px;
+        }
+
+        /* Button */
+        button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Delete Button */
+        .delete-button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #dc3545;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        .delete-button:hover {
+            background-color: #c82333;
+        }
+
+        /* Video Section */
+        video {
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+
+        /* Videos List */
+        ul li ul {
+            list-style: none;
+            padding-left: 20px;
+            margin-top: 20px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            ul {
+                padding-left: 0;
+            }
+
+            li {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+
+            button {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <h1>My Courses</h1>
+
+    <!-- Create Course Button -->
+    <a href="{% url 'add_course' %}">
+        <button class="create-course-button">Create Course</button>
+    </a>
+
     <ul>
         {% for course in courses %}
             <li>
-                <h2>{{ course.title }}</h2> <!-- Display course title -->
+                <h2>{{ course.title }}</h2>
                 <p><strong>Description:</strong> {{ course.description }}</p>
                 <p><strong>Category:</strong> {{ course.category.name }}</p>
-                <p><strong>Price:</strong> {{ course.price }}</p> <!-- Display course price -->
-                <p><strong>Duration:</strong> {{ course.duration }}</p> <!-- Display course duration -->
+                <p><strong>Price:</strong> {{ course.price }}</p>
+                <p><strong>Duration:</strong> {{ course.duration }}</p>
                 <p><strong>Created At:</strong> {{ course.created_at }}</p>
+                
                 {% if course.image %}
                     <p><strong>Image:</strong></p>
                     <img src="{{ course.image.url }}" alt="{{ course.title }}" style="max-width: 200px;">
                 {% endif %}
                 
-                <!-- Button to add a video to this course -->
-                <a href="{% url 'add_video' course.id %}"><button>Add Video</button></a>
+                <a href="{% url 'add_video' course.id %}">
+                    <button>Add Video</button>
+                </a>
+
+                <!-- Delete Course Button -->
+                <form action="{% url 'delete_course' course.id %}" method="POST" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="delete-button">Delete Course</button>
+                </form>
 
                 <h3>Videos:</h3>
                 {% if course.videos.exists %}
                     <ul>
                         {% for video in course.videos.all %}
                             <li>
-                                <p><strong>Video Title:</strong> {{ video.title_1 }}</p> <!-- Display video title -->
+                                <p><strong>Video Title:</strong> {{ video.title_1 }}</p>
                                 <p><strong>Uploaded At:</strong> {{ video.created_at }}</p>
                                 <video width="320" height="240" controls>
                                     <source src="{{ video.video_file.url }}" type="video/mp4">
                                     Your browser does not support the video tag.
                                 </video>
+                                
+                                <!-- Delete Video Button -->
+                                <form action="{% url 'delete_video' video.id %}" method="POST" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="delete-button">Delete Video</button>
+                                </form>
                             </li>
                         {% endfor %}
                     </ul>

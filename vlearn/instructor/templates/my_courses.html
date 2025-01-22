@@ -21,7 +21,11 @@
                 {% endif %}
                 
                 <!-- Button to add a video to this course -->
-                <a href="{% url 'add_video' course.id %}"><button>Add Video</button></a>
+                <a href="{% url 'instructor:add_video' course.id %}"><button>Add Video</button></a>
+                <a href="{% url 'quiz_app:create_quiz' course.id %}"><button>Add Quiz</button></a>
+                
+                <!-- Button to show quizzes for this course -->
+                <a href="{% url 'quiz_app:quiz_list' course.id %}"><button>Show Quiz</button></a>
 
                 <h3>Videos:</h3>
                 {% if course.videos.exists %}

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz List</title>
+</head>
+<body>
+    <h1>Quizzes for Course: {{ course.title }}</h1>
+
+    <!-- Button to go back to create quiz page -->
+    <a href="{% url 'quiz_app:create_quiz' course.id %}">
+        <button>Create New Quiz</button>
+    </a>
+
+    <!-- Button to go back to course listing page -->
+    <a href="{% url 'instructor:my_courses' %}">
+        <button>Back to Courses</button>
+    </a>
+
+    <ul>
+        {% for quiz in quizzes %}
+            <li>
+                <h2>{{ quiz.title }}</h2>
+                <p><strong>Created By:</strong> {{ quiz.created_by }}</p>
+                <p><strong>Description:</strong> {{ quiz.description }}</p>
+                <a href="{% url 'quiz_app:add_question' quiz.id %}">
+                    <button>Add Question</button>
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

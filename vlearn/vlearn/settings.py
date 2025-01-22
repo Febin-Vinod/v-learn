@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'core',
     'room',
     'instructor',
-    'certificates_app'
+    'certificates_app',
+    'quiz_app'
 
 ]
 STATIC_URL = '/static/'

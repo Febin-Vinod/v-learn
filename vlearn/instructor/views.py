@@ -166,6 +166,15 @@ def student_management(request):
 def instructor_management(request):
     # You can limit access to this view to certain instructors if needed
     return render(request, 'instructor_management.html', {'instructor': request.user.profile})
+def delete_course(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    course.delete()
+    return redirect('my_courses')  # Redirect to the courses list page
+def delete_video(request, video_id):
+    video = get_object_or_404(Video, id=video_id)
+    video.delete()
+    return redirect('my_courses')  # Redirect to the page showing all courses
+
 
 def logout_view(request):
     logout(request)

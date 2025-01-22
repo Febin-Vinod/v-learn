@@ -12,6 +12,8 @@
                 <h2>{{ course.title }}</h2> <!-- Display course title -->
                 <p><strong>Description:</strong> {{ course.description }}</p>
                 <p><strong>Category:</strong> {{ course.category.name }}</p>
+                <p><strong>Price:</strong> {{ course.price }}</p> <!-- Display course price -->
+                <p><strong>Duration:</strong> {{ course.duration }}</p> <!-- Display course duration -->
                 <p><strong>Created At:</strong> {{ course.created_at }}</p>
                 {% if course.image %}
                     <p><strong>Image:</strong></p>

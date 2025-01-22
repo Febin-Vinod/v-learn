@@ -28,10 +28,10 @@
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
 
-        <!-- Course Form Fields -->
+        <!-- Render the updated course form with all fields -->
         <h2>Course Information</h2>
         {{ course_form.as_p }}
-        
+
         <!-- New Category Input Field -->
         <div id="new-category-field" style="display: none;">
             <label for="id_new_category">New Category:</label>

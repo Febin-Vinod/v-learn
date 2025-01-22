@@ -56,8 +56,8 @@ class CourseDetailView(LoginRequiredMixin, View):
         course = get_object_or_404(Course, id=course_id)
 
         # Check if the user is already enrolled in the course
-        is_enrolled = Enrollment.objects.filter(student=request.user, course=course).exists()
-
+        enrollment = Enrollment.objects.filter(student=request.user, course=course).first()
+        is_enrolled = enrollment is not None
 
         if is_enrolled:
             instructor = course.instructor
@@ -79,6 +79,7 @@ class CourseDetailView(LoginRequiredMixin, View):
         context = {
             'course': course,
             'is_enrolled': is_enrolled,
+            'enrollment': enrollment,  # Add this line
             'videos': videos, 
             'room': room,
         }

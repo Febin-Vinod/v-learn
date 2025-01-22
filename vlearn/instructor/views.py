@@ -1,6 +1,12 @@
 from django.shortcuts import render, redirect
 from .forms import CourseForm, VideoForm, VideoFormSet
 from .models import Course, Category, Video
+from django.forms import modelformset_factory
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
+
 
 
 
@@ -41,54 +47,76 @@ from .models import Course, Category, Video
 
 def add_course(request):
     if request.method == 'POST':
-        # Get the category
         category_id = request.POST.get('category')
         new_category_name = request.POST.get('new_category')
 
-        if category_id == "others" and new_category_name:
-            # Create new category if "others" is selected
+        if category_id == 'others' and new_category_name:
             category, created = Category.objects.get_or_create(name=new_category_name)
-            request.POST = request.POST.copy()  # Create a writable copy of POST
+            request.POST = request.POST.copy()
             request.POST['category'] = category.id
 
-        # Handle the course form
         course_form = CourseForm(request.POST, request.FILES)
-        
-        # Handle the video formset
-        video_formset = VideoFormSet(request.POST, request.FILES)
+        video_form = VideoForm(request.POST, request.FILES)
 
-        if course_form.is_valid() and video_formset.is_valid():
-            # Save the course
+        if course_form.is_valid() and video_form.is_valid():
             course = course_form.save()
 
-            # Save the videos
-            for form in video_formset:
-                if form.is_valid():  # Check if the form is valid
-                    video = form.save(commit=False)
-                    video.course = course
-                    video.save()
+            video = video_form.save(commit=False)
+            video.course = course
+            video.save()
 
-            return redirect('my_courses')  # Redirect to course list after successful submission
+            return redirect('my_courses')
         else:
-            print(course_form.errors)  # Log form errors for debugging
-            print(video_formset.errors)  # Log formset errors for debugging
-
+            print("Course Form Errors:", course_form.errors)
+            print("Video Form Errors:", video_form.errors)
     else:
         course_form = CourseForm()
-        video_formset = VideoFormSet(queryset=Video.objects.none())  # Start with no video forms
+        video_form = VideoForm()
 
     return render(request, 'add_course.html', {
         'course_form': course_form,
-        'video_formset': video_formset,
+        'video_form': video_form,
     })
 
 
 
+
+
+
 def my_courses(request):
-    # Assuming courses can be filtered by the logged-in user
-    courses = Course.objects.all()  # Replace with filter for logged-in user if necessary
-    
+    courses = Course.objects.prefetch_related('videos', 'category')  # Optimize queries
     return render(request, 'my_courses.html', {'courses': courses})
 
+def add_video(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
 
+    # Creating formset for the Video model
+    VideoFormSet = modelformset_factory(Video, form=VideoForm, extra=1)
 
+    if request.method == 'POST':
+        formset = VideoFormSet(request.POST, request.FILES, queryset=Video.objects.filter(course=course))
+
+        if formset.is_valid():
+            # Save the formset and assign the course to each video
+            for form in formset:
+                video = form.save(commit=False)
+                video.course = course  # Set the course foreign key
+                video.save()
+
+            return HttpResponseRedirect(reverse('my_courses'))  # Redirect after saving the videos
+
+    else:
+        formset = VideoFormSet(queryset=Video.objects.filter(course=course))
+
+    return render(request, 'add_video.html', {'formset': formset, 'course': course})
+
+def instructor_dashboard(request):
+    return render(request, 'instructor_dashboard.html')
+
+def student_management(request):
+    # Logic for student management (e.g., list students, manage student data)
+    return render(request, 'student_management.html')
+
+def instructor_management(request):
+    # Logic for instructor management (e.g., manage instructors)
+    return render(request, 'instructor_management.html')

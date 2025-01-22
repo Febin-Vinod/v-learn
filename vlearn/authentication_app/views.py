@@ -102,7 +102,7 @@ class LoginView(View):
             if profile and profile.isStudent:
                 return redirect(f'{reverse("browse_courses")}?message=Welcome Student {profile.full_name}')
             elif profile and profile.isInstructor:
-                return redirect(f'{reverse("home")}?message=Welcome Instructor {profile.full_name}')
+                return redirect(f'{reverse("instructor_dashboard")}?message=Welcome Instructor {profile.full_name}')
             else:
                 return redirect(f'{reverse("home")}?message=Welcome {user.username}')
         return HttpResponse("Invalid credentials", status=401)

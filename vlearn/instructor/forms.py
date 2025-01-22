@@ -22,8 +22,10 @@ class CourseForm(forms.ModelForm):
                 raise forms.ValidationError('Please provide a new category name.')
             category = new_category  # Override with the new category
         return category
+
 class VideoForm(forms.ModelForm):
     class Meta:
         model = Video
-        fields = ['title', 'video_file']
+        fields = ['title_1', 'video_file']  # Use 'title_1' instead of 'title'
+
 VideoFormSet = modelformset_factory(Video, form=VideoForm, extra=1)  # extra=1 allows for 1 extra blank form

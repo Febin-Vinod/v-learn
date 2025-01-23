@@ -22,7 +22,7 @@
     {# Update the navbar section in all templates (home.html, rooms.html, and room.html) #}
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container">
-        <a class="navbar-brand" href="{% url 'home' %}">Learning Platform</a>
+        <a class="navbar-brand" href="{% url 'home' %}">V-learn</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -50,9 +50,14 @@
                 
                 <div class="chat-messages mb-4" id="chat-messages">
                     {% for message in messages %}
-                        <div class="message mb-2">
-                            <strong>{{ message.sender.user.username }}:</strong> 
-                            {{ message.content }}
+                        <div class="message d-flex align-items-start mb-3">
+                            <div class="icon me-3">
+                                <span style="font-size: 1.5rem;">{{ message.sender.random_icon }}</span>
+                            </div>
+                            <div>
+                                <strong>{{ message.sender.user.username }}</strong><br>
+                                {{ message.content }}
+                            </div>
                         </div>
                     {% endfor %}
                 </div>

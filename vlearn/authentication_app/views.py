@@ -9,6 +9,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 
 
 def generate_jwt_tokens(user):
@@ -34,9 +37,30 @@ class RegisterInstructor(View):
         address = request.POST.get('address')
         email = request.POST.get('email')
 
-        if not username:
-            return HttpResponse("Username is required", status=400)
+        # Validations
+        if not all([username, password, full_name, qualification, email]):
+            messages.error(request, "All required fields must be filled.")
+            return redirect('register_instructor')
 
+        try:
+            validate_email(email)
+        except ValidationError:
+            messages.error(request, "Invalid email format.")
+            return redirect('register_instructor')
+
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists.")
+            return redirect('register_instructor')
+
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "Email already exists.")
+            return redirect('register_instructor')
+
+        if len(password) < 8:
+            messages.error(request, "Password must be at least 8 characters long.")
+            return redirect('register_instructor')
+
+        # Create user and instructor
         user = User.objects.create_user(username=username, password=password, email=email)
         Instructor.objects.create(
             user=user,
@@ -46,8 +70,9 @@ class RegisterInstructor(View):
             phone=phone,
             address=address
         )
+        messages.success(request, "Registration successful. Please login.")
+        return redirect('login1')
 
-        return redirect('login1')  
 
 
 class RegisterStudent(View):
@@ -63,9 +88,30 @@ class RegisterStudent(View):
         address = request.POST.get('address')
         email = request.POST.get('email')
 
-        if not username:
-            return HttpResponse("Username is required", status=400)
+        # Validations
+        if not all([username, password, full_name, school, email]):
+            messages.error(request, "All required fields must be filled.")
+            return redirect('register_student')
 
+        try:
+            validate_email(email)
+        except ValidationError:
+            messages.error(request, "Invalid email format.")
+            return redirect('register_student')
+
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists.")
+            return redirect('register_student')
+
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "Email already exists.")
+            return redirect('register_student')
+
+        if len(password) < 8:
+            messages.error(request, "Password must be at least 8 characters long.")
+            return redirect('register_student')
+
+        # Create user and student
         user = User.objects.create_user(username=username, password=password, email=email)
         Student.objects.create(
             user=user,
@@ -74,7 +120,7 @@ class RegisterStudent(View):
             phone=phone,
             address=address
         )
-
+        messages.success(request, "Registration successful. Please login.")
         return redirect('login1') 
 
 
@@ -86,26 +132,27 @@ class LoginView(View):
         username = request.POST.get('username')
         password = request.POST.get('password')
 
+        # Validations
         if not username or not password:
-            return HttpResponse("Both username and password are required.", status=400)
+            messages.error(request, "Both username and password are required.")
+            return redirect('login1')
 
         user = authenticate(username=username, password=password)
-
         if user:
             login(request, user)
-
             if user.is_staff:
-                return redirect(f'{reverse("home")}')
+                return redirect('home')
 
             profile = getattr(user, 'profile', None)
-
-            if profile and profile.isStudent:
-                return redirect(f'{reverse("browse_courses")}?message=Welcome Student {profile.full_name}')
-            elif profile and profile.isInstructor:
-                return redirect(f'{reverse("instructor_dashboard")}?message=Welcome Instructor {profile.full_name}')
-            else:
-                return redirect(f'{reverse("home")}?message=Welcome {user.username}')
-        return HttpResponse("Invalid credentials", status=401)
+            if profile:
+                if profile.isStudent:
+                    return redirect('browse_courses')
+                elif profile.isInstructor:
+                    return redirect('instructor_dashboard')
+            return redirect('home')
+        else:
+            messages.error(request, "Invalid credentials.")
+            return redirect('login1')
 
 
 class HomePageView(LoginRequiredMixin, View):

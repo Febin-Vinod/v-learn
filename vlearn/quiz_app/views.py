@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import Quiz, Question, Choice
+from .models import Quiz, Question, Choice,Result
 from instructor.models import Course  # Assuming 'instructor_app' is where your course model resides
 from .forms import QuizForm, QuestionForm, ChoiceForm
 from django.http import HttpResponse
-from authentication_app.models import Profile, Instructor 
+from authentication_app.models import Profile, Instructor,Student 
 # Create Quiz View
 # Create Quiz View
 @login_required
@@ -180,3 +180,88 @@ def delete_quiz(request, quiz_id):
     except Exception as e:
         messages.error(request, f"An error occurred: {e}")
         return redirect('my_courses')  # Redirect to a safe page for unexpected errors
+
+
+def quiz_student_list(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    quizzes = Quiz.objects.filter(course=course)  # assuming you have a relation between quizzes and courses
+    return render(request, 'quiz_student_list.html', {'course': course, 'quizzes': quizzes})
+
+from student_app.models import Enrollment as StudentEnrollment
+
+@login_required
+def take_quiz(request, quiz_id):
+    try:
+        # Get the profile of the current logged-in user
+        profile = Profile.objects.get(user=request.user)
+
+        # Check if the user is a student
+        if not profile.isStudent:
+            return HttpResponse("You are not a student. Please contact the admin.")
+
+        # Get the User instance using request.user (which is the authenticated user)
+        user = request.user
+
+        # Get the Student instance using the related User instance
+        student = Student.objects.get(user=user)
+
+        # Get the quiz by ID
+        quiz = get_object_or_404(Quiz, id=quiz_id)
+
+        # Get all the questions related to the quiz
+        questions = quiz.questions.all()
+
+        if request.method == 'POST':
+            score = 0
+            # Loop through each question and check the answers
+            for question in questions:
+                selected_choice = request.POST.get(f'question_{question.id}')
+                if selected_choice:
+                    choice = Choice.objects.get(id=selected_choice)
+                    if choice.is_correct:
+                        score += 1
+
+            # Create and save the result
+            result = Result(
+                student=student,
+                quiz=quiz,
+                score=score,
+                percentage=(score / len(questions)) * 100 if questions else 0
+            )
+            result.calculate_status()  # Calculate the status (Passed/Failed)
+            result.save()
+
+            return redirect('quiz_result', quiz_id=quiz.id)  # Redirect to the result page after submission
+
+        return render(request, 'take_quiz.html', {'quiz': quiz, 'questions': questions})
+
+    except Profile.DoesNotExist:
+        return HttpResponse("Profile not found. Please contact the admin.")
+    except Student.DoesNotExist:
+        return HttpResponse("Student not found. Please contact the admin.")
+    
+
+
+def quiz_result(request, quiz_id):
+    try:
+        # Get the profile of the current logged-in user
+        profile = Profile.objects.get(user=request.user)
+
+        # Check if the user has a student profile
+        if not profile.isStudent:
+            return HttpResponse("You are not a student. Please contact the admin.")
+
+        # Get the Student instance associated with the logged-in user
+        student = Student.objects.get(user=request.user)
+
+        # Fetch all results for the student and quiz
+        results = Result.objects.filter(student=student, quiz__id=quiz_id)
+
+        if not results.exists():
+            return HttpResponse("Result not found. Please make sure you have completed the quiz.")
+
+        # Pass all results to the template
+        return render(request, 'quiz_result.html', {'results': results})
+
+    except Result.DoesNotExist:
+        return HttpResponse("Result not found. Please make sure you have completed the quiz.")

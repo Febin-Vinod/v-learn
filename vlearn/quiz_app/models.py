@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from authentication_app.models import Instructor
+from authentication_app.models import Instructor,Student
 from instructor.models import Course  # Assuming the Course model is in the instructor_app
 
 class Quiz(models.Model):
@@ -37,36 +37,33 @@ class Choice(models.Model):
         return f"{self.text} ({'Correct' if self.is_correct else 'Incorrect'})"
 
 class Result(models.Model):
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="results"
-    )  # A result belongs to a student
+    student = models.ForeignKey(
+        Student, on_delete=models.CASCADE, related_name="results",null=True
+    )  # Reference to Student instead of User
     quiz = models.ForeignKey(
         Quiz, on_delete=models.CASCADE, related_name="results"
-    )  # A result is for a specific quiz
+    )
     score = models.IntegerField()
     taken_at = models.DateTimeField(auto_now_add=True)
-    percentage = models.FloatField(null=True, blank=True)  # Store the score percentage
+    percentage = models.FloatField(null=True, blank=True)
     status = models.CharField(
         max_length=10,
         choices=[("Passed", "Passed"), ("Failed", "Failed")],
         default="Failed",
         null=True,
-    )  # Pass or fail status
-    previous_attempts = models.BooleanField(default=False)  # Track if passed earlier
+    )
+    previous_attempts = models.BooleanField(default=False)
 
     def __str__(self):
         return (
-            f"{self.user.username} - {self.quiz.title}: {self.score}/{self.quiz.questions.count()}"
+            f"{self.student.full_name} - {self.quiz.title}: {self.score}/{self.quiz.questions.count()}"
         )
 
     def calculate_status(self):
-        """
-        Calculates the percentage and determines if the user has passed the quiz.
-        """
         total_questions = self.quiz.questions.count()
         self.percentage = (self.score / total_questions) * 100 if total_questions > 0 else 0
         self.status = "Passed" if self.percentage >= 75 else "Failed"
         self.previous_attempts = (
-            self.quiz.results.filter(user=self.user, status="Passed").exists()
-        )  # Check if passed in prior attempts
+            self.quiz.results.filter(student=self.student, status="Passed").exists()
+        )
         self.save()

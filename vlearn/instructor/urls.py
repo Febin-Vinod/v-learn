@@ -12,5 +12,5 @@ urlpatterns = [
     path('manage-chat-rooms/', views.manage_chat_rooms, name='manage_chat_rooms'),
     path('delete_course/<int:course_id>/', views.delete_course, name='delete_course'),
     path('delete_video/<int:video_id>/', views.delete_video, name='delete_video'),
-
+    path('update_course/<int:course_id>/', views.update_course, name='update_course'),
 ]

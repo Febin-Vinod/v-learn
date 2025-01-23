@@ -29,3 +29,32 @@ class VideoForm(forms.ModelForm):
         fields = ['title_1', 'video_file']  # Use 'title_1' instead of 'title'
 
 VideoFormSet = modelformset_factory(Video, form=VideoForm, extra=1)  # extra=1 allows for 1 extra blank form
+
+class CourseUpdateForm(forms.ModelForm):
+    # Field for 'category' includes an option for 'others'
+    category = forms.ModelChoiceField(
+        queryset=Category.objects.all(),
+        required=False,  # Not required initially
+        empty_label="Select Category"
+    )
+    new_category = forms.CharField(
+        required=False,
+        label='New Category',
+        widget=forms.TextInput(attrs={'placeholder': 'Enter new category if others selected'})
+    )
+
+    class Meta:
+        model = Course
+        fields = ['title', 'description', 'category', 'price', 'duration', 'image']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        
+        # If "others" category is selected, ensure the new_category field is filled
+        category = cleaned_data.get('category')
+        new_category = cleaned_data.get('new_category')
+
+        if category is None and new_category == '':
+            raise forms.ValidationError('Please provide a new category name if you select "others".')
+
+        return cleaned_data

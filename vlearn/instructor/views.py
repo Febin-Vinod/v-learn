@@ -244,3 +244,68 @@ def update_course(request, course_id):
 def logout_view(request):
     logout(request)
     return redirect('login1')  # Redirect the user to the login page after logout
+
+
+
+
+
+from django.shortcuts import render, redirect
+from room.models import Room
+from student_app.models import Enrollment
+from django.utils.text import slugify
+
+@instructor_required
+@csrf_exempt
+def manage_chat_rooms(request):
+    try:
+        # Get the user's profile
+        profile = Profile.objects.get(user=request.user)
+        
+        # Check if the user is an instructor
+        if not profile.isInstructor:
+            return HttpResponse("You are not an instructor. Please contact the admin.")
+        
+        # Get the instructor instance
+        instructor = Instructor.objects.get(pk=profile.pk)
+        
+        # Get courses taught by the instructor
+        instructor_courses = Course.objects.filter(instructor=instructor)
+        
+        # Get chat rooms created by this instructor's profile
+        chat_rooms = Room.objects.filter(creator=profile)
+        
+        if request.method == 'POST':
+            course_id = request.POST.get('course')
+            room_name = request.POST.get('room_name')
+            
+            if course_id and room_name:
+                course = Course.objects.get(id=course_id)
+                
+                # Create new chat room
+                room = Room.objects.create(
+                    name=room_name,
+                    slug=slugify(room_name),
+                    creator=profile
+                )
+                
+                # Add instructor to participants
+                room.participants.add(profile)
+                
+                # Add enrolled students to participants
+                enrollments = Enrollment.objects.filter(course=course)
+                for enrollment in enrollments:
+                    student_profile = Profile.objects.get(user=enrollment.student)
+                    room.participants.add(student_profile)
+                
+                return redirect('manage_chat_rooms')
+        
+        context = {
+            'instructor_courses': instructor_courses,
+            'chat_rooms': chat_rooms
+        }
+        return render(request, 'instructor/manage_chat_rooms.html', context)
+        
+    except Profile.DoesNotExist:
+        return HttpResponse("You do not have a profile. Please contact the admin.")
+    except Instructor.DoesNotExist:
+        return HttpResponse("You are not registered as an instructor. Please contact the admin.")

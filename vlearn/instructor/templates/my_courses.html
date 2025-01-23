@@ -157,7 +157,7 @@
 
     <!-- Create Course Button -->
     <a href="{% url 'add_course' %}">
-        <button class="create-course-button">Create Course</button>
+        <button class="create-course-button">Create  Course</button>
     </a>
 
     <ul>
@@ -175,15 +175,12 @@
                     <img src="{{ course.image.url }}" alt="{{ course.title }}" style="max-width: 200px;">
                 {% endif %}
                 
-                <a href="{% url 'add_video' course.id %}">
-                    <button>Add Video</button>
-                </a>
-
-                <!-- Delete Course Button -->
-                <form action="{% url 'delete_course' course.id %}" method="POST" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="delete-button">Delete Course</button>
-                </form>
+                <!-- Button to add a video to this course -->
+                <a href="{% url 'add_video' course.id %}"><button>Add Video</button></a>
+                <a href="{% url 'create_quiz' course.id %}"><button>Add Quiz</button></a>
+                
+                <!-- Button to show quizzes for this course -->
+                <a href="{% url 'quiz_list' course.id %}"><button>Show Quiz</button></a>
 
                 <h3>Videos:</h3>
                 {% if course.videos.exists %}

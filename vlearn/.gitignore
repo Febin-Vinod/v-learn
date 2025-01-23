@@ -15,7 +15,7 @@ menv/
 # Ignore SQLite database
 *.sqlite3
 db.sqlite3
-
+migrations/
 # Ignore Django migration files (if you don't want to commit them)
 *.log
 

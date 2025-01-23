@@ -14,6 +14,7 @@ from django.utils.text import slugify
 from room.models import Room
 from django.db.models import Q
 from quiz_app.models import Quiz, Result
+from authentication_app.models import Student
 
 
 class BrowseCoursesView(LoginRequiredMixin,View):
@@ -55,24 +56,42 @@ class StudentDashboardView(LoginRequiredMixin, View):
         # Fetch enrollments for the student
         enrollments = Enrollment.objects.filter(student=request.user)
 
+        user = request.user
+
+        # Get the Student instance using the related User instance
+        
         # Check quiz results for each course
         courses_with_certificates = []
+        grades = []
         for enrollment in enrollments:
             quiz = Quiz.objects.filter(course=enrollment.course).first()
             quiz_passed = False
+            percentage = None
+            status = None
+
             if quiz:
-                result = Result.objects.filter(user=request.user, quiz=quiz, status="Passed").first()
+                student = Student.objects.get(user=user)
+                result = Result.objects.filter(student=student, quiz=quiz, status="Passed").first()
                 quiz_passed = result is not None
+                if result:
+                    percentage = result.percentage
+                    status = result.status
 
             courses_with_certificates.append({
                 'course': enrollment.course,
                 'enrollment': enrollment,
                 'quiz_passed': quiz_passed
             })
+            grades.append({
+                'course': enrollment.course,
+                'percentage': percentage,
+                'status': status,
+            })
 
         context = {
             'enrollments': enrollments,
             'courses_with_certificates': courses_with_certificates,
+            'grades': grades,
         }
 
         return render(request, 'student_dashboard.html', context)

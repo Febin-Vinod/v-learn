@@ -8,17 +8,20 @@ from xhtml2pdf import pisa
 from io import BytesIO
 from django.conf import settings
 from quiz_app.models import Quiz, Result
+from authentication_app.models import Student
 
 @login_required
 def generate_certificate(request, enrollment_id):
     enrollment = get_object_or_404(Enrollment, id=enrollment_id, student=request.user)
+    user=request.user
 
     # Check if the student passed the quiz
     quiz = Quiz.objects.filter(course=enrollment.course).first()
     if not quiz:
         return HttpResponseForbidden("No quiz available for this course.")
-    
-    result = Result.objects.filter(user=request.user, quiz=quiz, status="Passed").first()
+    student = Student.objects.get(user=user)
+    result = Result.objects.filter(student=student, quiz=quiz, status="Passed").first()
+
     if not result:
         return HttpResponseForbidden("You must pass the quiz to generate a certificate.")
     

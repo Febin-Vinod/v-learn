@@ -114,7 +114,7 @@
             display: inline-block;
             margin-top: 10px;
             padding: 10px 20px;
-            background-color: #28a745;
+            background-color: #f2f7f3;
             color: white;
             text-decoration: none;
             border-radius: 5px;
@@ -123,6 +123,7 @@
 
         .certificate-btn:hover {
             background-color: #218838;
+            
         }
     </style>
 </head>
@@ -161,11 +162,13 @@
         <div class="dashboard-section">
             <h2>Your Grades</h2>
             <ul class="grade-list">
-                <!-- Uncomment and update for grades
                 {% for grade in grades %}
-                    <li>{{ grade.course.name }}: {{ grade.grade }}</li>
+                    <li>
+                        <strong>{{ grade.course.title }}</strong>: 
+                        <span>Percentage: {{ grade.percentage|default:"N/A" }}%</span> | 
+                        <span>Status: {{ grade.status|default:"N/A" }}</span>
+                    </li>
                 {% endfor %}
-                -->
             </ul>
         </div>
 

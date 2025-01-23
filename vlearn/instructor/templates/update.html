@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Course</title>
+    <style>
+        /* General Reset */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+
+        /* Header */
+        h1 {
+            text-align: center;
+            color: #343a40;
+            margin-top: 30px;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        /* Form Container */
+        form {
+            width: 80%;
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 1.1rem;
+            color: #495057;
+        }
+
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+
+        .form-group textarea {
+            height: 150px;
+            resize: vertical;
+        }
+
+        /* Category Specific */
+        #new-category-field {
+            display: none;
+        }
+
+        /* Submit Button */
+        button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        /* File Input */
+        .file-input {
+            display: block;
+            margin-top: 10px;
+        }
+
+        .file-input input {
+            font-size: 1rem;
+        }
+
+        /* Current Image */
+        .current-image {
+            margin-top: 10px;
+        }
+
+        .current-image img {
+            max-width: 200px;
+            border-radius: 5px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            form {
+                padding: 15px;
+            }
+
+            button {
+                font-size: 0.9rem;
+            }
+
+            .form-group {
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Update Course</h1>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Course Title -->
+        <div class="form-group">
+            <label for="id_title">Course Title</label>
+            <input type="text" id="id_title" name="title" value="{{ course.title }}" required>
+        </div>
+
+        <!-- Course Description -->
+        <div class="form-group">
+            <label for="id_description">Course Description</label>
+            <textarea id="id_description" name="description" required>{{ course.description }}</textarea>
+        </div>
+
+        <!-- Category -->
+        <div class="form-group">
+            <label for="id_category">Category</label>
+            <select id="id_category" name="category" required>
+                <option value="">Select a category</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}" {% if category.id == course.category.id %}selected{% endif %}>{{ category.name }}</option>
+                {% endfor %}
+                <option value="others">Other</option>
+            </select>
+        </div>
+
+        <!-- New Category -->
+        <div id="new-category-field" class="form-group">
+            <label for="id_new_category">New Category</label>
+            <input type="text" id="id_new_category" name="new_category">
+        </div>
+
+        <!-- Price -->
+        <div class="form-group">
+            <label for="id_price">Price</label>
+            <input type="number" id="id_price" name="price" value="{{ course.price }}" required>
+        </div>
+
+        <!-- Duration -->
+        <div class="form-group">
+            <label for="id_duration">Duration</label>
+            <input type="text" id="id_duration" name="duration" value="{{ course.duration }}" required>
+        </div>
+
+        <!-- Course Image -->
+        <div class="form-group">
+            <label for="id_image">Course Image</label>
+            <input type="file" id="id_image" name="image" class="file-input">
+            {% if course.image %}
+                <div class="current-image">
+                    <img src="{{ course.image.url }}" alt="Current Image">
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Update Button -->
+        <button type="submit">Confirm Update</button>
+    </form>
+
+    <script>
+        function toggleNewCategoryField() {
+            const categoryField = document.getElementById('id_category');
+            const newCategoryField = document.getElementById('new-category-field');
+
+            // Check if the selected value is "others"
+            if (categoryField.value === 'others') {
+                newCategoryField.style.display = 'block';
+            } else {
+                newCategoryField.style.display = 'none';
+                document.getElementById('id_new_category').value = ''; // Clear the field if hidden
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            toggleNewCategoryField(); // Initialize visibility on page load
+            document.getElementById('id_category').addEventListener('change', toggleNewCategoryField);
+        });
+    </script>
+</body>
+</html>

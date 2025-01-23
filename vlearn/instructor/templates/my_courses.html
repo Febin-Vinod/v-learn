@@ -22,26 +22,38 @@
             font-weight: 700;
         }
 
-        /* Create Course Button */
-        .create-course-button {
-            display: block;
+        /* Create Course and Dashboard Button */
+        .create-course-button, .dashboard-button {
+            display: inline-block;
             width: 200px;
-            margin: 20px auto;
+            margin: 20px 10px;
             padding: 10px 20px;
             border: none;
-            background-color: #28a745;
-            color: white;
             font-size: 1rem;
             font-weight: 600;
             border-radius: 5px;
             cursor: pointer;
+            text-align: center;
             transition: background-color 0.3s;
-            text-decoration: none; /* Removes underline */
-            text-align: center; /* Centers the text */
+            text-decoration: none;
+        }
+
+        .create-course-button {
+            background-color: #28a745;
+            color: white;
         }
 
         .create-course-button:hover {
             background-color: #218838;
+        }
+
+        .dashboard-button {
+            background-color: #000000; /* Black color */
+            color: white;
+        }
+
+        .dashboard-button:hover {
+            background-color: #343a40; /* Darker shade of black for hover effect */
         }
 
         /* Courses List */
@@ -118,6 +130,25 @@
             background-color: #c82333;
         }
 
+        /* Update Button */
+        .update-button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #ffc107;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+            margin-left: 10px;
+        }
+
+        .update-button:hover {
+            background-color: #e0a800;
+        }
+
         /* Video Section */
         video {
             margin-top: 10px;
@@ -155,10 +186,15 @@
 <body>
     <h1>My Courses</h1>
 
-    <!-- Create Course Button -->
-    <a href="{% url 'add_course' %}">
-        <button class="create-course-button">Create Course</button>
-    </a>
+    <!-- Create Course and Dashboard Buttons -->
+    <div style="text-align: center;">
+        <a href="{% url 'add_course' %}">
+            <button class="create-course-button">Create Course</button>
+        </a>
+        <a href="{% url 'instructor_dashboard' %}">
+            <button class="dashboard-button">Dashboard</button>
+        </a>
+    </div>
 
     <ul>
         {% for course in courses %}
@@ -177,6 +213,11 @@
                 
                 <a href="{% url 'add_video' course.id %}">
                     <button>Add Video</button>
+                </a>
+
+                <!-- Update Course Button -->
+                <a href="{% url 'update_course' course.id %}">
+                    <button class="update-button">Update Course</button>
                 </a>
 
                 <!-- Delete Course Button -->

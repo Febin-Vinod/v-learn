@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .forms import CourseForm, VideoForm, VideoFormSet
+from .forms import CourseForm, VideoForm, VideoFormSet,CourseUpdateForm
 from .models import Course, Category, Video
 from authentication_app.models import Instructor, Profile
 from django.forms import modelformset_factory
@@ -112,6 +112,39 @@ def my_courses(request):
         return HttpResponse("You are not an instructor. Please contact the admin.")
 
 
+# @instructor_required
+# @csrf_exempt
+# def add_video(request, course_id):
+#     # Get the logged-in instructor profile
+#     try:
+#         instructor_profile = Instructor.objects.get(user=request.user)
+#     except Instructor.DoesNotExist:
+#         return HttpResponse("You are not an instructor. Please contact the admin.")
+
+#     # Get the course associated with the logged-in instructor
+#     course = get_object_or_404(Course, id=course_id, instructor=instructor_profile)
+
+#     # Create a formset for the Video model
+#     VideoFormSet = modelformset_factory(Video, form=VideoForm, extra=1)
+
+#     if request.method == 'POST':
+#         formset = VideoFormSet(request.POST, request.FILES, queryset=Video.objects.filter(course=course))
+
+#         if formset.is_valid():
+#             # Save the formset and assign the course to each video
+#             for form in formset:
+#                 video = form.save(commit=False)
+#                 video.course = course  # Set the course foreign key
+#                 video.save()
+
+#             return HttpResponseRedirect(reverse('my_courses'))  # Redirect after saving the videos
+#         else:
+#             print("Formset Errors:", formset.errors)
+#     else:
+#         formset = VideoFormSet(queryset=Video.objects.filter(course=course))
+
+#     return render(request, 'add_video.html', {'formset': formset, 'course': course})
+
 @instructor_required
 @csrf_exempt
 def add_video(request, course_id):
@@ -124,11 +157,12 @@ def add_video(request, course_id):
     # Get the course associated with the logged-in instructor
     course = get_object_or_404(Course, id=course_id, instructor=instructor_profile)
 
-    # Create a formset for the Video model
-    VideoFormSet = modelformset_factory(Video, form=VideoForm, extra=1)
+    # Create a formset for the Video model with no initial queryset
+    VideoFormSet = modelformset_factory(Video, form=VideoForm, extra=1, can_delete=False)
 
     if request.method == 'POST':
-        formset = VideoFormSet(request.POST, request.FILES, queryset=Video.objects.filter(course=course))
+        # Handle the submitted formset
+        formset = VideoFormSet(request.POST, request.FILES, queryset=Video.objects.none())
 
         if formset.is_valid():
             # Save the formset and assign the course to each video
@@ -141,10 +175,10 @@ def add_video(request, course_id):
         else:
             print("Formset Errors:", formset.errors)
     else:
-        formset = VideoFormSet(queryset=Video.objects.filter(course=course))
+        # Provide an empty queryset for the formset to show only new forms
+        formset = VideoFormSet(queryset=Video.objects.none())
 
     return render(request, 'add_video.html', {'formset': formset, 'course': course})
-
 
 
 @instructor_required
@@ -175,6 +209,37 @@ def delete_video(request, video_id):
     video.delete()
     return redirect('my_courses')  # Redirect to the page showing all courses
 
+
+def update_course(request, course_id):
+    # Fetch the course to be updated
+    course = get_object_or_404(Course, id=course_id)
+    
+    # Fetch all categories for the dropdown list
+    categories = Category.objects.all()
+    
+    if request.method == 'POST':
+        # If the form is submitted
+        form = CourseUpdateForm(request.POST, request.FILES, instance=course)
+        
+        if form.is_valid():
+            updated_course = form.save(commit=False)
+            
+            # Handle new category if 'others' is selected
+            if request.POST.get('category') == 'others':
+                new_category = request.POST.get('new_category')
+                category, created = Category.objects.get_or_create(name=new_category)
+                updated_course.category = category
+            
+            updated_course.save()
+            
+            # Redirect to the 'my_courses.html' page after updating
+            return redirect('my_courses')  # Assuming 'my_courses' is the name of the URL for the course list page
+    
+    else:
+        # If the request is not POST, render the update page with the course form
+        form = CourseUpdateForm(instance=course)
+    
+    return render(request, 'update.html', {'form': form, 'course': course, 'categories': categories})
 
 def logout_view(request):
     logout(request)

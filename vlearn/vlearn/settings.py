@@ -58,6 +58,11 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",  # Or os.path.join(BASE_DIR, "static") for older versions of Django
 ]
 
+from django.contrib.messages import constants as messages
+MESSAGE_TAGS = {
+    messages.ERROR: 'alert-danger',
+    messages.SUCCESS: 'alert-success',
+}
 
 WSGI_APPLICATION = 'django_chat.wsgi.application'
 ASGI_APPLICATION = 'django_chat.asgi.application'

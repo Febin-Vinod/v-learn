@@ -1,16 +1,26 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from .models import Certificate
 from student_app.models import Enrollment
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 from io import BytesIO
 from django.conf import settings
+from quiz_app.models import Quiz, Result
 
 @login_required
 def generate_certificate(request, enrollment_id):
     enrollment = get_object_or_404(Enrollment, id=enrollment_id, student=request.user)
+
+    # Check if the student passed the quiz
+    quiz = Quiz.objects.filter(course=enrollment.course).first()
+    if not quiz:
+        return HttpResponseForbidden("No quiz available for this course.")
+    
+    result = Result.objects.filter(user=request.user, quiz=quiz, status="Passed").first()
+    if not result:
+        return HttpResponseForbidden("You must pass the quiz to generate a certificate.")
     
     # Create certificate if it doesn't exist
     certificate, created = Certificate.objects.get_or_create(

@@ -13,6 +13,7 @@ from django.core.mail import send_mail
 from django.utils.text import slugify
 from room.models import Room
 from django.db.models import Q
+from quiz_app.models import Quiz, Result
 
 
 class BrowseCoursesView(LoginRequiredMixin,View):
@@ -51,16 +52,32 @@ class StudentDashboardView(LoginRequiredMixin, View):
         if not profile or not profile.isStudent:
             return render(request, 'home.html', status=403)
 
-        # Fetch enrolled courses and grades for the student
+        # Fetch enrollments for the student
         enrollments = Enrollment.objects.filter(student=request.user)
-        # grades = Grade.objects.filter(student=request.user)
+
+        # Check quiz results for each course
+        courses_with_certificates = []
+        for enrollment in enrollments:
+            quiz = Quiz.objects.filter(course=enrollment.course).first()
+            quiz_passed = False
+            if quiz:
+                result = Result.objects.filter(user=request.user, quiz=quiz, status="Passed").first()
+                quiz_passed = result is not None
+
+            courses_with_certificates.append({
+                'course': enrollment.course,
+                'enrollment': enrollment,
+                'quiz_passed': quiz_passed
+            })
 
         context = {
-            'enrollments': enrollments,  # List of courses the student is enrolled in
-            # 'grades': grades,            # List of grades for the student
+            'enrollments': enrollments,
+            'courses_with_certificates': courses_with_certificates,
         }
 
         return render(request, 'student_dashboard.html', context)
+
+
     
 
 class CourseDetailView(LoginRequiredMixin, View):

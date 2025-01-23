@@ -49,5 +49,5 @@ def room(request, slug):
             room.participants.filter(id=profile.id).exists()):
         return HttpResponseForbidden("You don't have access to this room")
     
-    messages = Message.objects.filter(room=room)[0:25]
+    messages = Message.objects.filter(room=room).order_by('date_added')
     return render(request, 'room/room.html', {'room': room, 'messages': messages})

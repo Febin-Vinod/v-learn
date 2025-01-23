@@ -47,12 +47,14 @@
             margin-bottom: 15px;
         }
 
-        .course-list, .grade-list {
+        .course-list,
+        .grade-list {
             list-style-type: none;
             padding: 0;
         }
 
-        .course-list li, .grade-list li {
+        .course-list li,
+        .grade-list li {
             background-color: #292929;
             margin-bottom: 10px;
             padding: 15px;
@@ -60,17 +62,20 @@
             transition: background-color 0.3s ease;
         }
 
-        .course-list li:hover, .grade-list li:hover {
+        .course-list li:hover,
+        .grade-list li:hover {
             background-color: #333333;
         }
 
-        .course-list li a, .grade-list li a {
+        .course-list li a,
+        .grade-list li a {
             color: #00bcd4;
             text-decoration: none;
             font-size: 1.1rem;
         }
 
-        .course-list li a:hover, .grade-list li a:hover {
+        .course-list li a:hover,
+        .grade-list li a:hover {
             text-decoration: underline;
         }
 
@@ -105,6 +110,20 @@
             color: #0097a7;
         }
 
+        .certificate-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .certificate-btn:hover {
+            background-color: #218838;
+        }
     </style>
 </head>
 
@@ -119,10 +138,22 @@
             <h2>Your Courses</h2>
             <ul class="course-list">
                 {% for enrollment in enrollments %}
-                    <li>
-                        <a href="{% url 'course_detail' enrollment.course.id %}">{{ enrollment.course.title }}</a>
-                        <span>Enrolled on: {{ enrollment.date_enrolled }}</span> <!-- Optional: Display enrollment date -->
-                    </li>
+                <li>
+                    <a href="{% url 'course_detail' enrollment.course.id %}">{{ enrollment.course.title }}</a>
+                    <span>Enrolled on: {{ enrollment.date_enrolled }}</span> <!-- Optional: Display enrollment date -->
+
+                    <!-- Display certificate button if the student has passed the quiz -->
+                    {% if courses_with_certificates %}
+                    {% for course_info in courses_with_certificates %}
+                    {% if course_info.course.id == enrollment.course.id and course_info.quiz_passed %}
+                    <a href="{% url 'certificates_app:generate_certificate' enrollment_id=course_info.enrollment.id %}"
+                        class="certificate-btn">
+                        View Certificate
+                    </a>
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                </li>
                 {% endfor %}
             </ul>
         </div>
@@ -142,7 +173,6 @@
             {% csrf_token %}
             <button type="submit" class="logout-btn">Logout</button>
         </form>
-        
 
         <a href="{% url 'browse_courses' %}" class="back-link">Back to Home</a>
     </div>

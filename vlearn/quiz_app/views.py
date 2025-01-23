@@ -137,19 +137,46 @@ def add_question(request, quiz_id):
 # Delete Quiz View
 @login_required
 def delete_quiz(request, quiz_id):
-    quiz = get_object_or_404(Quiz, id=quiz_id)
-
-    if quiz.created_by != request.user:
-        messages.error(request, "You do not have permission to delete this quiz.")
-        return redirect('quiz_list', course_id=quiz.course.id)
-
-    print(f"Attempting to delete quiz with ID: {quiz.id}")  # Ensure we're at this point
     try:
+        # Ensure the logged-in user has a profile
+        profile = Profile.objects.get(user=request.user)
+
+        # Check if the user is an instructor
+        if not profile.isInstructor:
+            return HttpResponse("You are not an instructor. Please contact the admin.")
+
+        # Get the Instructor instance using the profile's primary key
+        instructor = Instructor.objects.get(pk=profile.pk)
+
+        # Ensure the quiz exists and is linked to the course owned by the logged-in instructor
+        quiz = get_object_or_404(Quiz, id=quiz_id)
+
+        # Check if the quiz belongs to a course and ensure the course is owned by the instructor
+        if quiz.created_by != instructor:
+            messages.error(request, "You do not have permission to delete this quiz.")
+            return redirect('quiz_list', course_id=quiz.course.id)
+
+        # Ensure the course is owned by the logged-in instructor
+        if quiz.course.instructor != instructor:
+            messages.error(request, "You do not have permission to delete a quiz from this course.")
+            return redirect('quiz_list', course_id=quiz.course.id)
+
+        # If the quiz is valid and the instructor has permission, delete it
         quiz.delete()
-        print(f"Quiz {quiz.id} deleted.")  # Confirm it's being deleted
         messages.success(request, "Quiz deleted successfully!")
-    except Exception as e:
-        print(f"Error deleting quiz: {e}")  # Log the exception if any
-        messages.error(request, "There was an error deleting the quiz.")
+
+        # Redirect to the quiz list for the course
+        return redirect('quiz_list', course_id=quiz.course.id)
     
-    return redirect('quiz_list', course_id=quiz.course.id)
+    except Profile.DoesNotExist:
+        messages.error(request, "Profile not found. Please contact the admin.")
+        return redirect('my_courses')  # Redirect to a safe page if profile not found
+    except Instructor.DoesNotExist:
+        messages.error(request, "Instructor not found. Please contact the admin.")
+        return redirect('my_courses')  # Redirect to a safe page if instructor not found
+    except Quiz.DoesNotExist:
+        messages.error(request, "Quiz not found.")
+        return redirect('my_courses')  # Redirect to a safe page if quiz not found
+    except Exception as e:
+        messages.error(request, f"An error occurred: {e}")
+        return redirect('my_courses')  # Redirect to a safe page for unexpected errors

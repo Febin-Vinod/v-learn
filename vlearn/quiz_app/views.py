@@ -133,3 +133,18 @@ def add_question(request, quiz_id):
         'question_form': question_form,
         'choice_forms': choice_forms,
     })
+
+# Delete Quiz View
+@login_required
+def delete_quiz(request, quiz_id):
+    quiz = get_object_or_404(Quiz, id=quiz_id)
+
+    # Check if the logged-in user is the creator of the quiz
+    if quiz.created_by != request.user:
+        messages.error(request, "You do not have permission to delete this quiz.")
+        return redirect('quiz_list', course_id=quiz.course.id)
+
+    # Delete the quiz
+    quiz.delete()
+    messages.success(request, "Quiz deleted successfully!")
+    return redirect('quiz_list', course_id=quiz.course.id)

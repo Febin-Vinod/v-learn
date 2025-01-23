@@ -11,6 +11,6 @@
         {{ quiz_form.as_p }}
         <button type="submit">Create Quiz</button>
     </form>
-    <a href="{% url 'quiz_app:quiz_list' course.id %}">Back to Quiz List</a>
+    <a href="{% url 'quiz_list' course.id %}">Back to Quiz List</a>
 </body>
 </html>

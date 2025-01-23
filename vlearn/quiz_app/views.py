@@ -44,7 +44,7 @@ def create_quiz(request, course_id):
             quiz.course = course  # Assign the course instance to the quiz
             quiz.save()
             messages.success(request, "Quiz created successfully!")
-            return redirect('quiz_app:quiz_list', course_id=course.id)  # Make sure 'quiz_list' is correct
+            return redirect('quiz_list', course_id=course.id)  # Make sure 'quiz_list' is correct
     else:
         quiz_form = QuizForm()
 
@@ -123,7 +123,7 @@ def add_question(request, quiz_id):
                     choice.save()
 
             messages.success(request, "Question added successfully!")
-            return redirect('quiz_app:add_question', quiz_id=quiz.id)  # Stay on the same page to add more questions
+            return redirect('add_question', quiz_id=quiz.id)  # Stay on the same page to add more questions
     else:
         question_form = QuestionForm()
         choice_forms = [ChoiceForm(prefix=f'choice_{i}') for i in range(4)]
@@ -139,12 +139,17 @@ def add_question(request, quiz_id):
 def delete_quiz(request, quiz_id):
     quiz = get_object_or_404(Quiz, id=quiz_id)
 
-    # Check if the logged-in user is the creator of the quiz
     if quiz.created_by != request.user:
         messages.error(request, "You do not have permission to delete this quiz.")
         return redirect('quiz_list', course_id=quiz.course.id)
 
-    # Delete the quiz
-    quiz.delete()
-    messages.success(request, "Quiz deleted successfully!")
+    print(f"Attempting to delete quiz with ID: {quiz.id}")  # Ensure we're at this point
+    try:
+        quiz.delete()
+        print(f"Quiz {quiz.id} deleted.")  # Confirm it's being deleted
+        messages.success(request, "Quiz deleted successfully!")
+    except Exception as e:
+        print(f"Error deleting quiz: {e}")  # Log the exception if any
+        messages.error(request, "There was an error deleting the quiz.")
+    
     return redirect('quiz_list', course_id=quiz.course.id)

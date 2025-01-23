@@ -26,6 +26,7 @@ urlpatterns = [
     path('chat/', include('core.urls')),
     path('rooms/', include('room.urls')),
     path('certificates/', include('certificates_app.urls')),
+    path('quiz/', include('quiz_app.urls')),
     
 ]
 

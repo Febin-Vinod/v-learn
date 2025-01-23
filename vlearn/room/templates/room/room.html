@@ -51,7 +51,7 @@
                 <div class="chat-messages mb-4" id="chat-messages">
                     {% for message in messages %}
                         <div class="message mb-2">
-                            <strong>{{ message.user.username }}:</strong> 
+                            <strong>{{ message.sender.user.username }}:</strong> 
                             {{ message.content }}
                         </div>
                     {% endfor %}

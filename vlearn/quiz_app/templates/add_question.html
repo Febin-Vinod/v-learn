@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Questions</title>
+</head>
+<body>
+    <h1>Add Questions for Quiz: {{ quiz.title }}</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ question_form.as_p }}
+
+        <h3>Choices</h3>
+        {% for form in choice_forms %}
+            <div>
+                {{ form.as_p }}
+            </div>
+        {% endfor %}
+        <button type="submit">Add Question</button>
+    </form>
+</body>
+</html>

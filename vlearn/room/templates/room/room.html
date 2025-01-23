@@ -1,4 +1,3 @@
-{# room/templates/room/room.html #}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,64 +6,116 @@
     <title>{{ room.name }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        body {
+            background: #f5f7fa;
+        }
+        .chat-container {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
         .chat-messages {
             height: 400px;
             overflow-y: auto;
-            border: 1px solid #ddd;
             padding: 15px;
-            border-radius: 5px;
-            background: #fff;
+            border-radius: 10px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+        }
+        .message {
+            padding: 10px;
+            border-radius: 10px;
+            background: #eef1f7;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .message.own {
+            background: #d4edda;
+        }
+        .message .icon {
+            background: #6c757d;
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            margin-right: 10px;
+        }
+        .message-content {
+            font-size: 14px;
+        }
+        .message strong {
+            color: #495057;
+        }
+        .message.own .icon {
+            background: #28a745;
+        }
+        .input-group {
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        #chat-message-input {
+            border-radius: 0;
+        }
+        #chat-message-submit {
+            border-radius: 0;
         }
     </style>
 </head>
-<body class="bg-light">
-    <!-- Same navbar as other pages -->
-    {# Update the navbar section in all templates (home.html, rooms.html, and room.html) #}
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container">
-        <a class="navbar-brand" href="{% url 'home' %}">V-learn</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'rooms' %}">Chat</a>
-                    </li>
-                    <li class="nav-item">
-                        <form method="post" action="{% url 'logout' %}" class="d-inline">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-link nav-link">Logout</button>
-                        </form>
-                    </li>
-                {% endif %}
-            </ul>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">V-learn</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'rooms' %}">Chat</a>
+                        </li>
+                        <li class="nav-item">
+                            <form method="post" action="{% url 'logout' %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-link nav-link">Logout</button>
+                            </form>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
+
+    <!-- Chat Room -->
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-md-8">
-                <h1 class="text-center mb-4">{{ room.name }}</h1>
-                
-                <div class="chat-messages mb-4" id="chat-messages">
-                    {% for message in messages %}
-                        <div class="message d-flex align-items-start mb-3">
-                            <div class="icon me-3">
-                                <span style="font-size: 1.5rem;">{{ message.sender.random_icon }}</span>
-                            </div>
-                            <div>
-                                <strong>{{ message.sender.user.username }}</strong><br>
-                                {{ message.content }}
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
+                <div class="chat-container">
+                    <h2 class="text-center text-primary mb-4">{{ room.name }}</h2>
 
-                <div class="input-group">
-                    <input type="text" id="chat-message-input" class="form-control" placeholder="Type your message...">
-                    <button class="btn btn-primary" id="chat-message-submit">Send</button>
+                    <!-- Chat Messages -->
+                    <div class="chat-messages mb-4" id="chat-messages">
+                        {% for message in messages %}
+                            <div class="message {% if message.sender.user.username == request.user.username %}own{% endif %}">
+                                <div class="icon">{{ message.sender.user.username|slice:":1" }}</div>
+                                <div class="message-content">
+                                    <strong>{{ message.sender.user.username }}</strong>: {{ message.content }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Input -->
+                    <div class="input-group">
+                        <input type="text" id="chat-message-input" class="form-control" placeholder="Type your message...">
+                        <button class="btn btn-primary" id="chat-message-submit">Send</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -74,27 +125,24 @@
     {{ request.user.username|json_script:"json-username" }}
 
     <script>
-        // Keep your existing WebSocket JavaScript code here
         const roomName = JSON.parse(document.getElementById('json-roomname').textContent);
         const userName = JSON.parse(document.getElementById('json-username').textContent);
         const chatSocket = new WebSocket(
-            'ws://'
-            + window.location.host
-            + '/ws/'
-            + roomName
-            + '/'
+            'ws://' + window.location.host + '/ws/' + roomName + '/'
         );
 
         chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
             if (data.message) {
-                document.querySelector('#chat-messages').innerHTML += (
-                    '<div class="message mb-2"><strong>' + 
-                    data.username + 
-                    ':</strong> ' + 
-                    data.message + 
-                    '</div>'
-                );
+                const isOwnMessage = data.username === userName;
+                const messageClass = isOwnMessage ? 'own' : '';
+                document.querySelector('#chat-messages').innerHTML += `
+                    <div class="message ${messageClass}">
+                        <div class="icon">${data.username[0]}</div>
+                        <div class="message-content">
+                            <strong>${data.username}</strong>: ${data.message}
+                        </div>
+                    </div>`;
                 scrollToBottom();
             }
         };
@@ -111,13 +159,14 @@
             const messageInputDom = document.querySelector('#chat-message-input');
             const message = messageInputDom.value;
 
-            chatSocket.send(JSON.stringify({
-                'message': message,
-                'username': userName,
-                'room': roomName
-            }));
-
-            messageInputDom.value = '';
+            if (message.trim() !== '') {
+                chatSocket.send(JSON.stringify({
+                    'message': message,
+                    'username': userName,
+                    'room': roomName
+                }));
+                messageInputDom.value = '';
+            }
         };
 
         function scrollToBottom() {

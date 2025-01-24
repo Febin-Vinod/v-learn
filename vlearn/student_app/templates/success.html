@@ -1,0 +1,17 @@
+<!-- payment_success.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful</title>
+</head>
+<body>
+    <h1>Payment Successful!</h1>
+    <p>Thank you for enrolling in the course "{{ course.title }}".</p>
+    <p>You have successfully paid ₹{{ course.price }} for this course.</p>
+    
+    <!-- Optionally, you can show a button to take the user to their dashboard or course page -->
+    <a href="{% url 'browse_courses' %}">Go to My Courses</a>
+</body>
+</html>

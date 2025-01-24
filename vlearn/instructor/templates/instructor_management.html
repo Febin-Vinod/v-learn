@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instructor Management</title>
+    <style>
+        /* Add some basic styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #2c3e50;
+        }
+
+        .button-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .button-container button {
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .button-container button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Manage Instructors</h1>
+    <p>This page will allow you to manage instructors (add, update, delete instructors).</p>
+    <!-- Add the "Add Course" button -->
+    <div class="button-container">
+        <a href="{% url 'add_course' %}">
+            <button>Add Course</button>
+        </a>
+    </div>
+
+    <!-- Add the "View My Courses" button -->
+    <div class="button-container">
+        <a href="{% url 'my_courses' %}">
+            <button>View My Courses</button>
+        </a>
+    </div>
+</body>
+</html>

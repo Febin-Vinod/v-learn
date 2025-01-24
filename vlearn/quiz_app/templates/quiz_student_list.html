@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Take Quiz - {{ course.title }}</title>
+    <style>
+        /* Similar styling to course page for consistency */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f7fc;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .quiz-item {
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            background: #fff;
+            cursor: pointer;
+        }
+
+        .quiz-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: #3498db;
+            font-size: 1rem;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Quizzes for Course: {{ course.title }}</h1>
+
+        {% if quizzes %}
+        <div class="quiz-list">
+            {% for quiz in quizzes %}
+            <div class="quiz-item">
+                <a href="{% url 'take_quiz' quiz.id %}">{{ quiz.title }}</a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>No quizzes available for this course yet.</p>
+        {% endif %}
+
+        <a href="{% url 'browse_courses' %}" class="back-link">Back to Courses</a>
+    </div>
+</body>
+
+</html>

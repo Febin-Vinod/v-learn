@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Chat Rooms</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* General body styling */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: #ffffff;
+        }
+
+        h1, h2 {
+            text-align: center;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Chat Rooms Container */
+        .chat-rooms-container {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        /* Room Form Styling */
+        .room-form {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .room-form input, 
+        .room-form select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 5px;
+            color: #ffffff;
+            font-size: 1rem;
+        }
+
+        .room-form input::placeholder {
+            color: #bfbfbf;
+        }
+
+        .room-form button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: #00ffcc;
+            color: #000;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        .room-form button:hover {
+            background: #00d4a3;
+            box-shadow: 0 0 15px #00ffcc;
+        }
+
+        /* Room List Styling */
+        .room-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .room-card {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .room-card h3 {
+            color: #00ffcc;
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        .room-card p {
+            color: #dddddd;
+            margin-bottom: 15px;
+        }
+
+        .room-card a {
+            display: inline-block;
+            padding: 10px 15px;
+            background: #00ffcc;
+            color: #000;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        .room-card a:hover {
+            background: #00d4a3;
+            box-shadow: 0 0 10px #00ffcc;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Responsive Typography */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Manage Chat Rooms</h1>
+        <h2>Your Chat Rooms</h2>
+        
+        <div class="chat-rooms-container">
+            <div class="room-list">
+                {% for room in chat_rooms %}
+                <div class="room-card">
+                    <h3>{{ room.name }}</h3>
+                    <p>Participants: {{ room.participants.count }}</p>
+                    <a href="{% url 'room' room.slug %}" class="btn">Enter Room</a>
+                </div>
+                {% empty %}
+                <p>No chat rooms created yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

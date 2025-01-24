@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from .forms import CourseForm, VideoForm, VideoFormSet,CourseUpdateForm
 from .models import Course, Category, Video
 from authentication_app.models import Instructor, Profile
+from student_app.models import Enrollment
+from quiz_app.models import Result 
 from django.forms import modelformset_factory
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
@@ -11,45 +13,9 @@ from authentication_app.decorators import instructor_required
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import logout
-from django.http import HttpResponse  #
+from django.http import HttpResponse  
 
-
-
-# def add_course(request):
-#     if request.method == 'POST':
-#         category_id = request.POST.get('category')  # Get the selected category
-#         new_category_name = request.POST.get('new_category')  # Get the new category name (if any)
-
-#         if category_id == "others" and new_category_name:  # If "Others" is selected and new category is provided
-#             # Create the new category or fetch it if it already exists
-#             category, created = Category.objects.get_or_create(name=new_category_name)
-#             # Replace the "Others" category ID with the new category's ID in the POST data
-#             request.POST = request.POST.copy()
-#             request.POST['category'] = category.id
-
-#         # Handle the course form
-#         course_form = CourseForm(request.POST, request.FILES)
-#         video_formset = VideoFormSet(request.POST, request.FILES)  # Initialize the formset for POST requests
-        
-#         if course_form.is_valid() and video_formset.is_valid():
-#             course = course_form.save()  # Save the course first
-            
-#             # Handle the video formset
-#             for form in video_formset:
-#                 video = form.save(commit=False)
-#                 video.course = course  # Associate the video with the course
-#                 video.save()
-
-#             return redirect('my_courses')  # Redirect to the course list after saving
-#     else:
-#         course_form = CourseForm()  # Handle the empty course form for GET requests
-#         video_formset = VideoFormSet(queryset=Video.objects.none())  # Empty formset for new videos
-
-#     return render(request, 'add_course.html', {
-#         'course_form': course_form,
-#         'video_formset': video_formset,
-#     })
-
+@instructor_required
 @login_required
 @csrf_exempt
 def add_course(request):
@@ -112,39 +78,6 @@ def my_courses(request):
         return HttpResponse("You are not an instructor. Please contact the admin.")
 
 
-# @instructor_required
-# @csrf_exempt
-# def add_video(request, course_id):
-#     # Get the logged-in instructor profile
-#     try:
-#         instructor_profile = Instructor.objects.get(user=request.user)
-#     except Instructor.DoesNotExist:
-#         return HttpResponse("You are not an instructor. Please contact the admin.")
-
-#     # Get the course associated with the logged-in instructor
-#     course = get_object_or_404(Course, id=course_id, instructor=instructor_profile)
-
-#     # Create a formset for the Video model
-#     VideoFormSet = modelformset_factory(Video, form=VideoForm, extra=1)
-
-#     if request.method == 'POST':
-#         formset = VideoFormSet(request.POST, request.FILES, queryset=Video.objects.filter(course=course))
-
-#         if formset.is_valid():
-#             # Save the formset and assign the course to each video
-#             for form in formset:
-#                 video = form.save(commit=False)
-#                 video.course = course  # Set the course foreign key
-#                 video.save()
-
-#             return HttpResponseRedirect(reverse('my_courses'))  # Redirect after saving the videos
-#         else:
-#             print("Formset Errors:", formset.errors)
-#     else:
-#         formset = VideoFormSet(queryset=Video.objects.filter(course=course))
-
-#     return render(request, 'add_video.html', {'formset': formset, 'course': course})
-
 @instructor_required
 @csrf_exempt
 def add_video(request, course_id):
@@ -186,14 +119,66 @@ def add_video(request, course_id):
 def instructor_dashboard(request):
     return render(request, 'instructor_dashboard.html', {'instructor': request.user.profile})
 
-
-@instructor_required
+    
+@login_required
 @csrf_exempt
 def student_management(request):
-    # Fetch students related to the logged-in instructor's courses
-    courses = Course.objects.filter(instructor=request.user.instructor)
-    #students = Student.objects.filter(course__in=courses)  # Assuming there's a relation to a course model
-    return render(request, 'student_management.html', {'students': students})
+    # Get the instructor profile associated with the logged-in user
+    instructor_profile = request.user.profile  # Assuming the 'Profile' is linked to the 'User'
+    
+    # Ensure the user is an instructor
+    if not instructor_profile.isInstructor:
+        return render(request, 'access_denied.html')  # Redirect to an access-denied page
+
+    # Get all courses that belong to this instructor
+    courses = Course.objects.filter(instructor=instructor_profile)
+
+    # Prepare course data with enrolled students and their results
+    course_data = []
+    for course in courses:
+        enrollments = Enrollment.objects.filter(course=course)  # Fetch all enrollments for the course
+        print(f"Enrollments for {course.title}: {enrollments.count()}")  # Debugging statement
+        
+        students_data = []
+
+        for enrollment in enrollments:
+            student_profile = enrollment.student.profile  # Get the profile of the student
+            
+            # Check if the student has taken any quiz in this course
+            results = Result.objects.filter(student=student_profile, quiz__course=course)
+            print(f"Results for {student_profile.full_name} in {course.title}: {results.count()}")  # Debugging statement
+            
+            if results.exists():
+                # If results exist, show the quiz results
+                result = results.first()  # Assuming there's only one result per quiz
+                students_data.append({
+                    'student': student_profile,
+                    'quiz_title': result.quiz.title,
+                    'score': f"{result.score}/{result.quiz.questions.count()}",
+                    'percentage': result.percentage,
+                    'status': result.status,
+                })
+            else:
+                # If no results exist, show "Not Applicable" for quiz details
+                students_data.append({
+                    'student': student_profile,
+                    'quiz_title': "Not Applicable",
+                    'score': "Not Applicable",
+                    'percentage': "Not Applicable",
+                    'status': "Not Applicable",
+                })
+        
+        course_data.append({
+            'course': course,
+            'students': students_data,
+        })
+    
+    return render(request, 'student_management.html', {
+        'instructor': instructor_profile,
+        'course_data': course_data,
+    })    
+
+
 
 @instructor_required
 @csrf_exempt

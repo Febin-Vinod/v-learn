@@ -99,8 +99,6 @@
         button {
             padding: 10px 20px;
             border: none;
-            background-color: #007bff;
-            color: white;
             font-size: 1rem;
             font-weight: 600;
             border-radius: 5px;
@@ -181,6 +179,31 @@
                 font-size: 0.9rem;
             }
         }
+
+        /* Custom Button Colors */
+        .add-video-button {
+            background-color: #007bff;
+        }
+
+        .add-video-button:hover {
+            background-color: #0056b3;
+        }
+
+        .add-quiz-button {
+            background-color: #17a2b8;
+        }
+
+        .add-quiz-button:hover {
+            background-color: #117a8b;
+        }
+
+        .show-quiz-button {
+            background-color: #6c757d;
+        }
+
+        .show-quiz-button:hover {
+            background-color: #5a6268;
+        }
     </style>
 </head>
 <body>
@@ -211,10 +234,6 @@
                     <img src="{{ course.image.url }}" alt="{{ course.title }}" style="max-width: 200px;">
                 {% endif %}
                 
-                <a href="{% url 'add_video' course.id %}">
-                    <button>Add Video</button>
-                </a>
-
                 <!-- Update Course Button -->
                 <a href="{% url 'update_course' course.id %}">
                     <button class="update-button">Update Course</button>
@@ -225,12 +244,19 @@
                     {% csrf_token %}
                     <button type="submit" class="delete-button">Delete Course</button>
                 </form>
+
                 <!-- Button to add a video to this course -->
-                <a href="{% url 'add_video' course.id %}"><button>Add Video</button></a>
-                <a href="{% url 'create_quiz' course.id %}"><button>Add Quiz</button></a>
+                <a href="{% url 'add_video' course.id %}">
+                    <button class="add-video-button">Add Video</button>
+                </a>
+                <a href="{% url 'create_quiz' course.id %}">
+                    <button class="add-quiz-button">Add Quiz</button>
+                </a>
                 
                 <!-- Button to show quizzes for this course -->
-                <a href="{% url 'quiz_list' course.id %}"><button>Show Quiz</button></a>
+                <a href="{% url 'quiz_list' course.id %}">
+                    <button class="show-quiz-button">Show Quiz</button>
+                </a>
 
                 <h3>Videos:</h3>
                 {% if course.videos.exists %}

@@ -109,7 +109,99 @@
         .back-link:hover {
             color: #2980b9;
         }
+
+        .course-videos {
+            margin-top: 30px;
+        }
+
+        .video-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .video-item {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .video-item:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .video-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: #3498db;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .video-title h3 {
+            margin: 0;
+        }
+
+        .video-title .toggle-icon {
+            font-size: 1.5rem;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+
+        .video-content {
+            display: none;
+            padding: 10px 20px;
+            background: #f4f7fc;
+        }
+
+        .video-content video {
+            width: 100%;
+            max-width: 640px;
+            margin: 0 auto;
+            display: block;
+        }
+        .course-chatroom {
+        margin-top: 30px;
+        padding: 20px;
+        background: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    .chat-btn {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 1rem;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .chat-btn:hover {
+        background-color: #2980b9;
+    }
     </style>
+    <script>
+        function toggleVideo(videoId) {
+            const videoContent = document.getElementById(`video-${videoId}`);
+            const toggleIcon = videoContent.previousElementSibling.querySelector('.toggle-icon');
+
+            if (videoContent.style.display === 'block') {
+                videoContent.style.display = 'none';
+                toggleIcon.textContent = '+';
+            } else {
+                videoContent.style.display = 'block';
+                toggleIcon.textContent = '-';
+            }
+        }
+    </script>
 </head>
 
 <body>
@@ -148,6 +240,34 @@
             {% endif %}
         </div>
 
+        {% if is_enrolled %}
+        <div class="course-videos">
+            <h2>Course Videos</h2>
+            <ul class="video-list">
+                {% for video in videos %}
+                <li class="video-item">
+                    <div class="video-title" onclick="toggleVideo({{ forloop.counter }})">
+                        <h3>{{ video.title_1 }}</h3>
+                        <span class="toggle-icon">+</span>
+                    </div>
+                    <div class="video-content" id="video-{{ forloop.counter }}">
+                        <video width="640" height="360" controls>
+                            <source src="{{ video.video_file.url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        {% endif %}
+        {% if is_enrolled %}
+        <div class="course-chatroom">
+            <button class="chat-btn" onclick="window.location.href='{% url 'room' room.slug %}'">Chat</button>
+        </div>
+        {% endif %}
+
         <div style="margin-top: 20px;">
             <a href="{% url 'browse_courses' %}" class="back-link">Back to Browse Courses</a>
         </div>
@@ -162,3 +282,5 @@
 </body>
 
 </html>
+
+

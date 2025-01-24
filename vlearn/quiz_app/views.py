@@ -241,7 +241,7 @@ def take_quiz(request, quiz_id):
         return HttpResponse("Student not found. Please contact the admin.")
     
 
-
+@login_required
 def quiz_result(request, quiz_id):
     try:
         # Get the profile of the current logged-in user

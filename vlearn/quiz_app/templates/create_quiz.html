@@ -2,15 +2,86 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Quiz</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f7fc;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        button {
+            background: #3498db;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #3498db;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: #2980b9;
+        }
+    </style>
 </head>
 <body>
-    <h1>Create Quiz for Course: {{ course.title }}</h1>
-    <form method="POST">
-        {% csrf_token %}
-        {{ quiz_form.as_p }}
-        <button type="submit">Create Quiz</button>
-    </form>
-    <a href="{% url 'quiz_list' course.id %}">Back to Quiz List</a>
+    <div class="container">
+        <h1>Create Quiz for Course: {{ course.title }}</h1>
+        <form method="POST">
+            {% csrf_token %}
+            {{ quiz_form.as_p }}
+            <button type="submit">Create Quiz</button>
+        </form>
+        <a href="{% url 'quiz_list' course.id %}" class="back-link">Back to Quiz List</a>
+    </div>
 </body>
 </html>

@@ -1,17 +1,132 @@
-<!-- payment_success.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment Successful</title>
+    <style>
+        /* Global Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #111;
+            color: #fff;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        /* Container */
+        .container {
+            max-width: 800px;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 2;
+        }
+
+        .container::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, rgba(59, 89, 152, 0.1), rgba(59, 89, 152, 0.15));
+            z-index: -1;
+            animation: glowing 5s infinite ease-in-out;
+        }
+
+        @keyframes glowing {
+            0% {
+                background: rgba(59, 89, 152, 0.1);
+            }
+            50% {
+                background: rgba(59, 89, 152, 0.25);
+            }
+            100% {
+                background: rgba(59, 89, 152, 0.1);
+            }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #58d8e2;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            text-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin: 15px 0;
+            font-weight: 500;
+            color: #ccc;
+        }
+
+        a {
+            font-size: 1.4rem;
+            padding: 12px 35px;
+            background-color: #58d8e2;
+            color: #111;
+            text-decoration: none;
+            border-radius: 50px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        a:hover {
+            background-color: #43b6cc;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transform: translateY(-4px);
+        }
+
+        a:active {
+            background-color: #2c8a9b;
+            transform: translateY(2px);
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            a {
+                font-size: 1.2rem;
+                padding: 10px 30px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Payment Successful!</h1>
-    <p>Thank you for enrolling in the course "{{ course.title }}".</p>
-    <p>You have successfully paid ₹{{ course.price }} for this course.</p>
-    
-    <!-- Optionally, you can show a button to take the user to their dashboard or course page -->
-    <a href="{% url 'browse_courses' %}">Go to My Courses</a>
+
+    <div class="container">
+        <h1>Payment Successful!</h1>
+        <p>Thank you for enrolling in the course <strong>"{{ course.title }}"</strong>.</p>
+        <p>You have successfully paid ₹{{ course.price }} for this course.</p>
+        
+        <a href="{% url 'browse_courses' %}">Go to My Courses</a>
+    </div>
+
 </body>
 </html>

@@ -3,11 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Management</title>
+    <title>Instructor Dashboard</title>
+    <style>
+        /* styles.css integrated within HTML */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+        }
+
+        h1, h2, h3 {
+            color: #333;
+        }
+
+        .course {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f7f7f7;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #e9e9e9;
+        }
+
+        .button-container {
+            margin-bottom: 20px;
+        }
+
+        .go-dashboard-btn {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            text-decoration: none;
+        }
+
+        .go-dashboard-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
-    <h1>Manage Students</h1>
-    <p>This page will allow you to manage students (add, update, delete students).</p>
-    <!-- You can add more functionality here, like a list of students or forms to add/edit students -->
+    <div class="container">
+        <!-- Button to redirect to dashboard -->
+        <div class="button-container">
+            <a href="{% url 'instructor_dashboard' %}" class="go-dashboard-btn">
+                Go to Dashboard
+            </a>
+        </div>
+
+        <h1>Welcome, {{ instructor.full_name }}</h1>
+        <h2>Your Courses</h2>
+        
+        {% for course_data in course_data %}
+            <div class="course">
+                <h3>Course: {{ course_data.course.title }}</h3>
+                <p><strong>Enrolled Students:</strong></p>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Quiz Title</th>
+                            <th>Score</th>
+                            <th>Percentage</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student_data in course_data.students %}
+                            <tr>
+                                <td>{{ student_data.student.full_name }}</td>
+                                <td>{{ student_data.quiz_title }}</td>
+                                <td>{{ student_data.score }}</td>
+                                <td>{{ student_data.percentage }}</td>
+                                <td>{{ student_data.status }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endfor %}
+    </div>
 </body>
 </html>

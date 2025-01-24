@@ -293,11 +293,7 @@
         </div>
 
         {% endif %}
-        {% if is_enrolled %}
-        <div class="course-chatroom">
-            <button class="chat-btn" onclick="window.location.href='{% url 'room' room.slug %}'">Chat</button>
-        </div>
-        {% endif %}
+        
         <div style="margin-top: 20px;">
             <a href="{% url 'browse_courses' %}" class="back-link">Back to Browse Courses</a>
         </div>

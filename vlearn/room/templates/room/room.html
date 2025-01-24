@@ -14,56 +14,81 @@
             border-radius: 10px;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
             padding: 20px;
+            width: 600px;
+            margin-left: 100px;
+            margin-top: 70px;
         }
         .chat-messages {
-            height: 400px;
-            overflow-y: auto;
-            padding: 15px;
-            border-radius: 10px;
-            background: #f9f9f9;
-            border: 1px solid #ddd;
-        }
-        .message {
-            padding: 10px;
-            border-radius: 10px;
-            background: #eef1f7;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-        }
-        .message.own {
-            background: #d4edda;
-        }
-        .message .icon {
-            background: #6c757d;
-            color: #fff;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 18px;
-            margin-right: 10px;
-        }
-        .message-content {
-            font-size: 14px;
-        }
-        .message strong {
-            color: #495057;
-        }
-        .message.own .icon {
-            background: #28a745;
-        }
-        .input-group {
-            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        #chat-message-input {
-            border-radius: 0;
-        }
-        #chat-message-submit {
-            border-radius: 0;
-        }
+    height: 400px;
+    overflow-y: auto;
+    padding: 15px;
+    border-radius: 10px;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    display: flex;
+    flex-direction: column; /* Stack messages vertically */
+    gap: 10px; /* Add spacing between messages */
+}
+
+.message {
+    padding: 10px 15px;
+    border-radius: 15px;
+    max-width: 80%; /* Increase max width for mobile readability */
+    margin-bottom: 0;
+    display: block;
+    word-wrap: break-word;
+}
+
+.message.own {
+    background: #d4edda; /* Green for sent messages */
+    margin-left: auto; /* Align to the right */
+    text-align: right;
+}
+
+.message.received {
+    background: #eef1f7; /* Light blue for received messages */
+    margin-right: auto; /* Align to the left */
+    text-align: left;
+}
+
+/* Responsive Design for Mobile Devices */
+@media (max-width: 576px) {
+    .chat-container {
+        padding: 10px; /* Reduce padding for smaller screens */
+    }
+
+    .chat-messages {
+        height: 300px; /* Adjust height for mobile screens */
+        padding: 10px;
+    }
+
+    .message {
+        padding: 8px 10px; /* Adjust padding for messages */
+        font-size: 14px; /* Reduce font size */
+        max-width: 90%; /* Allow more horizontal space for messages */
+    }
+
+    .message strong {
+        font-size: 12px; /* Smaller font size for sender name */
+    }
+
+    .message .timestamp {
+        font-size: 10px; /* Smaller font size for timestamps */
+    }
+
+    .input-group {
+        flex-direction: column; /* Stack input and button vertically */
+    }
+
+    #chat-message-input {
+        border-radius: 5px 5px 0 0;
+        margin-bottom: 5px;
+    }
+
+    #chat-message-submit {
+        border-radius: 0 0 5px 5px;
+    }
+}
     </style>
 </head>
 <body>
@@ -78,7 +103,7 @@
                 <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href=#>Chat</a>
+                            <a class="nav-link" href="#">Chat</a>
                         </li>
                         <li class="nav-item">
                             <form method="get" action="{% url 'browse_courses'%}" class="d-inline">
@@ -102,11 +127,10 @@
                     <!-- Chat Messages -->
                     <div class="chat-messages mb-4" id="chat-messages">
                         {% for message in messages %}
-                            <div class="message {% if message.sender.user.username == request.user.username %}own{% endif %}">
-                                <div class="icon">{{ message.sender.user.username|slice:":1" }}</div>
-                                <div class="message-content">
-                                    <strong>{{ message.sender.user.username }}</strong>: {{ message.content }}
-                                </div>
+                            <div class="message {% if message.sender.user.username == request.user.username %}own{% else %}received{% endif %}">
+                                <strong>{{ message.sender.user.username }}</strong>
+                                <span>{{ message.content }}</span>
+                                <div class="timestamp">{{ message.timestamp|date:"H:i a" }}</div>
                             </div>
                         {% endfor %}
                     </div>
@@ -135,13 +159,16 @@
             const data = JSON.parse(e.data);
             if (data.message) {
                 const isOwnMessage = data.username === userName;
-                const messageClass = isOwnMessage ? 'own' : '';
+                const messageClass = isOwnMessage ? 'own' : 'received';
+                const timestamp = new Date().toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                });
                 document.querySelector('#chat-messages').innerHTML += `
                     <div class="message ${messageClass}">
-                        <div class="icon">${data.username[0]}</div>
-                        <div class="message-content">
-                            <strong>${data.username}</strong>: ${data.message}
-                        </div>
+                        <strong>${data.username}</strong>
+                        <span>${data.message}</span>
+                        <div class="timestamp">${timestamp}</div>
                     </div>`;
                 scrollToBottom();
             }

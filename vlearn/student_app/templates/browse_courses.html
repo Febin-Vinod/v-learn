@@ -289,7 +289,20 @@
     background-color: #0097a7;
 }
 
+.average-rating {
+    margin-top: 10px;
+    font-size: 1.1em;
+    color: #f39c12;
+}
 
+.avg-rating {
+    font-weight: bold;
+}
+
+.fas.fa-star {
+    color: #f39c12;
+    margin-left: 5px;
+}
 
     </style>
 </head>
@@ -351,6 +364,18 @@
                             <h2>{{ course.title }}</h2>
                             <p>{{ course.description|slice:":150" }}...</p>
                             <p><strong>Instructor:</strong> {{ course.instructor }}</p>
+            
+                            <!-- Display Average Rating -->
+                            <div class="average-rating">
+                                {% if course.avg_rating %}
+                                    <b style="color: black;">Rating:</b><span class="avg-rating">{{ course.avg_rating|floatformat:1 }}</span>
+                                    <i class="fas fa-star"></i> <!-- You can add stars here if needed -->
+                                {% else %}
+                                    <span>No ratings yet</span>
+                                {% endif %}
+                            </div>
+                            <br>
+            
                             <a href="{% url 'course_detail' course.id %}" class="enroll-btn">View Details</a>
                         </div>
                     {% endfor %}
@@ -358,6 +383,9 @@
                     <p>No courses available for the selected category.</p>
                 {% endif %}
             </div>
+            
+            
+            
         {% endif %}
     {% else %}
         <div class="login-prompt">

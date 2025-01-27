@@ -29,6 +29,7 @@ db.sqlite3
 env
 pyc
 _pycache_
+media/
 
 
 

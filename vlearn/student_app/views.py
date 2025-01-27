@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import View
-from .models import Enrollment
+from .models import Enrollment, CourseRating
 from instructor.models import Course, Category
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
@@ -15,7 +15,8 @@ from room.models import Room
 from django.db.models import Q
 from quiz_app.models import Quiz, Result
 from authentication_app.models import Student
-
+from django.db.models import Avg, Count
+from django.contrib import messages
 
 class BrowseCoursesView(LoginRequiredMixin,View):
     @csrf_exempt
@@ -41,7 +42,15 @@ class BrowseCoursesView(LoginRequiredMixin,View):
                 Q(title__icontains=search_query) | Q(instructor__full_name__icontains=search_query)
             )
 
+
+         # Annotate courses with average rating
+        courses = courses.annotate(avg_rating=Avg('ratings__rating'))
+        # Pass the range for the stars
+    
+
         categories = Category.objects.all()  # Pass categories for the dropdown
+    
+      
 
         return render(request, 'browse_courses.html', {'courses': courses, 'categories': categories})
 
@@ -130,12 +139,24 @@ class CourseDetailView(LoginRequiredMixin, View):
         # Get the videos only if the student is enrolled
         videos = course.videos.all() if is_enrolled else []
 
+         # Fetch ratings
+        user_rating = CourseRating.objects.filter(course=course, student=request.user).first()
+        ratings = course.ratings.aggregate(
+            average=Avg('rating'),
+            count=Count('id')
+        )
+        ratings['details'] = course.ratings.all()
+
         context = {
             'course': course,
             'is_enrolled': is_enrolled,
             'enrollment': enrollment,  # Add this line
             'videos': videos, 
             'room': room,
+            'user_rating': user_rating,
+            'ratings': ratings,
+            'rating_range': range(1, 6),
+            
         }
         return render(request, 'course_detail.html', context)
 
@@ -237,3 +258,19 @@ def payment_success(request, course_id):
         'course': course,
     }
     return render(request, 'success.html', context)
+
+def rate_course(request, course_id):
+    if request.method == 'POST':
+        course = get_object_or_404(Course, id=course_id)
+        rating_value = request.POST.get('rating')
+        review = request.POST.get('review', '')
+
+        # Save or update the rating
+        rating, created = CourseRating.objects.update_or_create(
+            student=request.user,
+            course=course,
+            defaults={'rating': rating_value, 'review': review}
+        )
+
+        # Redirect to the course detail page
+        return redirect('course_detail', course_id=course.id)

@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
     <title>Course Detail</title>
     <style>
         /* Global Styling */
@@ -210,6 +212,19 @@
     .chat-btn:hover {
         background-color: #2980b9;
     }
+    .star-rating {
+        display: flex;
+        flex-direction: row;
+    }
+    .star-rating .fa-star {
+        font-size: 24px;
+        color: gray;
+        cursor: pointer;
+        margin-right: 5px;
+    }
+    .star-rating .fa-star.checked {
+        color: gold;
+    }
     </style>
     <script>
         function toggleVideo(videoId) {
@@ -225,6 +240,20 @@
             }
         }
     </script>
+    <script>
+        function highlightStars(rating) {
+    const stars = document.querySelectorAll('.star-rating .fa-star');
+    stars.forEach((star, index) => {
+        if (index < rating) {
+            star.classList.add('checked');
+        } else {
+            star.classList.remove('checked');
+        }
+    });
+}
+
+    </script>
+    
 </head>
 
 <body>
@@ -243,6 +272,29 @@
                 <p class="course-meta">Instructor: {{ course.instructor }}</p>
                 <p class="course-meta">Duration: {{ course.duration }}</p>
             </div>
+            {% if is_enrolled %}
+            <form method="post" action="{% url 'rate_course' course.id %}" id="rating-form">
+                {% csrf_token %}
+                <div class="star-rating">
+                    {% for i in rating_range %}
+                    <input type="radio" id="star-{{ i }}" name="rating" value="{{ i }}" style="display: none;"
+                        {% if user_rating and user_rating.rating == i %}checked{% endif %}>
+                    <label for="star-{{ i }}">
+                        <i class="fas fa-star {% if user_rating and user_rating.rating >= i %}checked{% endif %}" 
+                           onclick="highlightStars({{ i }})" 
+                           data-value="{{ i }}"></i>
+                    </label>
+                    {% endfor %}
+                </div>
+                <textarea name="review" placeholder="Leave a review (optional)">{% if user_rating %}{{ user_rating.review }}{% endif %}</textarea>
+                <button type="submit">Submit</button>
+            </form>
+            
+            
+            {% endif %}
+            
+
+
         </div>
 
         <div class="course-description">

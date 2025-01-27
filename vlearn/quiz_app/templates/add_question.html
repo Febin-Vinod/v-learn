@@ -87,6 +87,20 @@
 </head>
 <body>
     <div class="container">
+        {% if messages %}
+            <div class="alert alert-danger">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <style>
+            .alert-danger {
+                background-color: #f8d7da;  /* Light red background */
+                color: #721c24;  /* Dark red text */
+                border-color: #f5c6cb;  /* Light red border */
+            }
+        </style>
         <h1>Add Questions for Quiz: {{ quiz.title }}</h1>
         <form method="POST">
             {% csrf_token %}

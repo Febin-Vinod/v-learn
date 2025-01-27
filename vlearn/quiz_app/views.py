@@ -98,7 +98,6 @@ def add_question(request, quiz_id):
         
         # Get the Instructor instance using the profile's primary key
         instructor = Instructor.objects.get(pk=profile.pk)
-    
     except Profile.DoesNotExist:
         return HttpResponse("Profile not found. Please contact the admin.")
 
@@ -111,19 +110,27 @@ def add_question(request, quiz_id):
         question_form = QuestionForm(request.POST)
         choice_forms = [ChoiceForm(request.POST, prefix=f'choice_{i}') for i in range(4)]
 
+        # Validate question and choices
         if question_form.is_valid() and all(c.is_valid() for c in choice_forms):
-            question = question_form.save(commit=False)
-            question.quiz = quiz  # Link the question to the quiz
-            question.save()
+            # Check for at least one correct choice
+            correct_choices = [c.cleaned_data.get('is_correct') for c in choice_forms if c.cleaned_data.get('is_correct')]
+            if not correct_choices:
+                messages.error(request, "A question must have at least one correct choice.")
+            else:
+                # Save the question and associated choices
+                question = question_form.save(commit=False)
+                question.quiz = quiz  # Link the question to the quiz
+                question.save()
 
-            for choice_form in choice_forms:
-                if choice_form.is_valid():
+                for choice_form in choice_forms:
                     choice = choice_form.save(commit=False)
                     choice.question = question  # Link the choice to the question
                     choice.save()
 
-            messages.success(request, "Question added successfully!")
-            return redirect('add_question', quiz_id=quiz.id)  # Stay on the same page to add more questions
+                messages.success(request, "Question added successfully!")
+                return redirect('add_question', quiz_id=quiz.id)  # Stay on the same page to add more questions
+        else:
+            messages.error(request, "Please correct the errors in the form.")
     else:
         question_form = QuestionForm()
         choice_forms = [ChoiceForm(prefix=f'choice_{i}') for i in range(4)]
@@ -133,7 +140,6 @@ def add_question(request, quiz_id):
         'question_form': question_form,
         'choice_forms': choice_forms,
     })
-
 # Delete Quiz View
 @login_required
 def delete_quiz(request, quiz_id):
@@ -265,3 +271,37 @@ def quiz_result(request, quiz_id):
 
     except Result.DoesNotExist:
         return HttpResponse("Result not found. Please make sure you have completed the quiz.")
+    
+
+@login_required
+def manage_questions(request, quiz_id):
+    quiz = get_object_or_404(Quiz, id=quiz_id)
+
+    try:
+        # Check if the user is an instructor
+        profile = Profile.objects.get(user=request.user)
+        if not profile.isInstructor:
+            return HttpResponse("You are not an instructor. Please contact the admin.")
+        
+        # Fetch the instructor instance
+        instructor = Instructor.objects.get(pk=profile.pk)
+    except Profile.DoesNotExist:
+        return HttpResponse("Profile not found. Please contact the admin.")
+    
+    if quiz.created_by != instructor:
+        messages.error(request, "You do not have permission to manage questions for this quiz.")
+        return redirect('unauthorized')  # Replace with your unauthorized page or logic
+
+    questions = quiz.questions.all()
+
+    if request.method == 'POST':
+        question_id = request.POST.get('question_id')
+        question = get_object_or_404(Question, id=question_id)
+        question.delete()
+        messages.success(request, "Question deleted successfully!")
+        return redirect('manage_questions', quiz_id=quiz.id)
+
+    return render(request, 'manage_questions.html', {
+        'quiz': quiz,
+        'questions': questions,
+    })

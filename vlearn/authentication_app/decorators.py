@@ -1,6 +1,5 @@
 from django.http import HttpResponseForbidden
 from functools import wraps
-
 def instructor_required(view_func):
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):

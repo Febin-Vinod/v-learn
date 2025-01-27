@@ -118,7 +118,6 @@ def add_video(request, course_id):
 @csrf_exempt
 def instructor_dashboard(request):
     return render(request, 'instructor_dashboard.html', {'instructor': request.user.profile})
-
     
 @login_required
 @csrf_exempt

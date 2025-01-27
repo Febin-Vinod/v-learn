@@ -13,6 +13,7 @@ class Profile(models.Model):
     isStudent = models.BooleanField(default=False)
     isInstructor = models.BooleanField(default=False)
 
+
     def __str__(self):
         return f"Profile: {self.full_name}"
 
@@ -20,9 +21,10 @@ class Profile(models.Model):
 class Instructor(Profile):
     qualification = models.CharField(max_length=100)
     bio = models.TextField(blank=True, null=True)
+    is_approved = models.BooleanField(default=False)  # Add approval flag
 
     def save(self, *args, **kwargs):
-        # Set isInstructor flag to True
+        # Ensure the isInstructor flag is set to True
         self.isInstructor = True
         super().save(*args, **kwargs)
 

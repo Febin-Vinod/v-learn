@@ -12,6 +12,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib import messages
+from django.views.decorators.csrf import csrf_exempt
 
 
 def generate_jwt_tokens(user):
@@ -124,6 +127,35 @@ class RegisterStudent(View):
         return redirect('login1') 
 
 
+# class LoginView(View):
+#     def get(self, request):
+#         return render(request, 'login.html')
+
+#     def post(self, request):
+#         username = request.POST.get('username')
+#         password = request.POST.get('password')
+
+#         # Validations
+#         if not username or not password:
+#             messages.error(request, "Both username and password are required.")
+#             return redirect('login1')
+
+#         user = authenticate(username=username, password=password)
+#         if user:
+#             login(request, user)
+#             if user.is_staff:
+#                 return redirect('home')
+
+#             profile = getattr(user, 'profile', None)
+#             if profile:
+#                 if profile.isStudent:
+#                     return redirect('browse_courses')
+#                 elif profile.isInstructor:
+#                     return redirect('instructor_dashboard')
+#             return redirect('home')
+#         else:
+#             messages.error(request, "Invalid credentials.")
+#             return redirect('login1')
 class LoginView(View):
     def get(self, request):
         return render(request, 'login.html')
@@ -140,19 +172,37 @@ class LoginView(View):
         user = authenticate(username=username, password=password)
         if user:
             login(request, user)
-            if user.is_staff:
+
+            # Check if the user is an instructor and if they are approved
+            profile = getattr(user, 'profile', None)
+            if profile and profile.isInstructor:
+                try:
+                    # Instead of using profile, we use the user to get the associated Instructor
+                    instructor = Instructor.objects.get(user=user)
+                    if not instructor.is_approved:  # Check if instructor is approved
+                        messages.error(request, "Your account is pending approval by the admin.")
+                        return redirect('login1')  # Redirect to the home page or another page
+                except Instructor.DoesNotExist:
+                    messages.error(request, "Instructor profile does not exist.")
+                    return redirect('login1')
+
+            # Redirect based on user role
+            if user.is_superuser:
+                return redirect('approve_instructors')  # Redirect to the instructor approval page
+            elif user.is_staff:
                 return redirect('home')
 
-            profile = getattr(user, 'profile', None)
             if profile:
                 if profile.isStudent:
-                    return redirect('browse_courses')
+                    return redirect('browse_courses')  # Replace with your student dashboard URL
                 elif profile.isInstructor:
-                    return redirect('instructor_dashboard')
+                    return redirect('instructor_dashboard')  # Replace with your instructor dashboard URL
+
             return redirect('home')
         else:
             messages.error(request, "Invalid credentials.")
             return redirect('login1')
+
 
 
 class HomePageView(LoginRequiredMixin, View):
@@ -164,6 +214,27 @@ class HomePageView(LoginRequiredMixin, View):
             'profile': profile
         }
         return render(request, 'home.html', context)
+# Check if the user is a superuser
+def admin_only(user):
+    return user.is_superuser
+
+@user_passes_test(admin_only)
+def approve_instructors_view(request):
+    if request.method == "POST":
+        instructor_id = request.POST.get("instructor_id")
+        try:
+            instructor = Instructor.objects.get(id=instructor_id)
+            instructor.is_approved = True
+            instructor.save()
+            messages.success(request, f"Instructor {instructor.full_name} has been approved.")
+        except Instructor.DoesNotExist:
+            messages.error(request, "Instructor not found.")
+        return redirect("approve_instructors")
+
+    # Fetch all instructors awaiting approval
+    instructors = Instructor.objects.filter(is_approved=False)
+    return render(request, "approve_instructors.html", {"instructors": instructors})
+
 
 
 class LogoutView(View):

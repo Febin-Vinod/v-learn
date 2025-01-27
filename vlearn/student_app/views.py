@@ -103,7 +103,12 @@ class StudentDashboardView(LoginRequiredMixin, View):
 class CourseDetailView(LoginRequiredMixin, View):
     def get(self, request, course_id):
         # Ensure the logged-in user is a student
+        course = get_object_or_404(Course, pk=course_id)
+        reviews = CourseRating.objects.filter(course=course)  # Assuming Review is the model storing reviews
         profile = getattr(request.user, 'profile', None)
+
+        average_rating = reviews.aggregate(Avg('rating'))['rating__avg'] or 0 
+        
         if not profile or not profile.isStudent:
             return render(request, 'unauthorized.html', status=403)
 
@@ -148,6 +153,8 @@ class CourseDetailView(LoginRequiredMixin, View):
             'user_rating': user_rating,
             'ratings': ratings,
             'rating_range': range(1, 6),
+            'reviews': reviews,
+            'average_rating': average_rating,
             
         }
         return render(request, 'course_detail.html', context)

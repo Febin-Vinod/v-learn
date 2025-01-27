@@ -225,6 +225,29 @@
     .star-rating .fa-star.checked {
         color: gold;
     }
+    button[type="submit"] {
+            margin-top: 10px;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #2ecc71;
+        }
+        textarea {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+        }
     </style>
     <script>
         function toggleVideo(videoId) {
@@ -262,7 +285,7 @@
     <div style="text-align: center; margin-top: 50px;">
         <p>You need to be a student to view this page.</p>
         <a href="{% url 'home' %}" class="back-link">Go back to home</a>
-    </div>
+</div>
     {% else %}
     <div class="course-detail-container">
         <div class="course-header">
@@ -271,27 +294,20 @@
                 <h1 class="course-title">{{ course.title }}</h1>
                 <p class="course-meta">Instructor: {{ course.instructor }}</p>
                 <p class="course-meta">Duration: {{ course.duration }}</p>
-            </div>
-            {% if is_enrolled %}
-            <form method="post" action="{% url 'rate_course' course.id %}" id="rating-form">
-                {% csrf_token %}
-                <div class="star-rating">
-                    {% for i in rating_range %}
-                    <input type="radio" id="star-{{ i }}" name="rating" value="{{ i }}" style="display: none;"
-                        {% if user_rating and user_rating.rating == i %}checked{% endif %}>
-                    <label for="star-{{ i }}">
-                        <i class="fas fa-star {% if user_rating and user_rating.rating >= i %}checked{% endif %}" 
-                           onclick="highlightStars({{ i }})" 
-                           data-value="{{ i }}"></i>
-                    </label>
-                    {% endfor %}
+                <div class="aggregate-rating" style="margin-bottom: 20px;">
+                    <h3>Average Rating:</h3>
+                    <div class="star-rating">
+                        {% for i in rating_range %}
+                            <i class="fas fa-star {% if average_rating >= i %}checked{% endif %}"></i>
+                        {% endfor %}
+                    </div>
+                    <p>Average Rating: {{ average_rating|floatformat:1 }} out of 5</p>
                 </div>
-                <textarea name="review" placeholder="Leave a review (optional)">{% if user_rating %}{{ user_rating.review }}{% endif %}</textarea>
-                <button type="submit">Submit</button>
-            </form>
+            </div>
+           
             
             
-            {% endif %}
+      {% endif %}
             
 
 
@@ -349,14 +365,58 @@
         <div style="margin-top: 20px;">
             <a href="{% url 'browse_courses' %}" class="back-link">Back to Browse Courses</a>
         </div>
-    </div>
+   
+     {% if is_enrolled %}
+            <form method="post" action="{% url 'rate_course' course.id %}" id="rating-form">
+                {% csrf_token %}
+                <div class="star-rating">
+                    {% for i in rating_range %}
+                    <input type="radio" id="star-{{ i }}" name="rating" value="{{ i }}" style="display: none;"
+                        {% if user_rating and user_rating.rating == i %}checked{% endif %}>
+                    <label for="star-{{ i }}">
+                        <i class="fas fa-star {% if user_rating and user_rating.rating >= i %}checked{% endif %}" 
+                           onclick="highlightStars({{ i }})" 
+                           data-value="{{ i }}"></i>
+                    </label>
+                    {% endfor %}
+                </div>
+                <textarea name="review" placeholder="Leave a review (optional)">{% if user_rating %}{{ user_rating.review }}{% endif %}</textarea>
+                <button type="submit">Submit</button>
+            </form>
+       {% endif %}
+
+         <!-- Reviews Section -->
+<div class="course-reviews" style="margin-top: 30px;">
+    <h2>Course Reviews</h2>
+
+    {% if reviews %}
+        <ul>
+            {% for review in reviews %}
+                <li style="margin-bottom: 20px;">
+                    <div style="font-weight: bold;">{{ review.student.username }}</div>
+                    <div class="star-rating">
+                        {% for i in rating_range %}
+                            <i class="fas fa-star {% if review.rating >= i %}checked{% endif %}"></i>
+                        {% endfor %}
+                    </div>
+                    <p>{{ review.review }}</p>
+                    <p><small>Posted on: {{ review.date_rated|date:"F d, Y" }}</small></p>  <!-- Display formatted date -->
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No reviews yet. Be the first to leave a review!</p>
     {% endif %}
+</div>
+    </div>
     {% else %}
     <div style="text-align: center; margin-top: 50px;">
         <p>You need to be logged in to view course details.</p>
         <a href="{% url 'login' %}" class="enroll-btn">Login</a>
     </div>
     {% endif %}
+    
+
 </body>
 
 </html>

@@ -42,7 +42,15 @@ class BrowseCoursesView(LoginRequiredMixin,View):
                 Q(title__icontains=search_query) | Q(instructor__full_name__icontains=search_query)
             )
 
+
+         # Annotate courses with average rating
+        courses = courses.annotate(avg_rating=Avg('ratings__rating'))
+        # Pass the range for the stars
+    
+
         categories = Category.objects.all()  # Pass categories for the dropdown
+    
+      
 
         return render(request, 'browse_courses.html', {'courses': courses, 'categories': categories})
 

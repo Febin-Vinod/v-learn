@@ -305,3 +305,35 @@ def manage_questions(request, quiz_id):
         'quiz': quiz,
         'questions': questions,
     })
+
+
+@login_required
+def edit_question(request, question_id):
+    question = get_object_or_404(Question, id=question_id)
+    choices = question.choices.all()
+
+    if request.method == 'POST':
+        question_form = QuestionForm(request.POST, instance=question)
+        choice_forms = [
+            ChoiceForm(request.POST, prefix=f'choice_{i}', instance=choice) for i, choice in enumerate(choices)
+        ]
+
+        if question_form.is_valid() and all(c.is_valid() for c in choice_forms):
+            question_form.save()
+
+            for choice_form in choice_forms:
+                choice_form.save()
+
+            messages.success(request, "Question updated successfully!")
+            return redirect('manage_questions', quiz_id=question.quiz.id)
+    else:
+        question_form = QuestionForm(instance=question)
+        choice_forms = [
+            ChoiceForm(prefix=f'choice_{i}', instance=choice) for i, choice in enumerate(choices)
+        ]
+
+    return render(request, 'edit_question.html', {
+        'question_form': question_form,
+        'choice_forms': choice_forms,
+        'question': question,
+    })

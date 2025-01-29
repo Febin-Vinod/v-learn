@@ -17,6 +17,8 @@ from quiz_app.models import Quiz, Result
 from authentication_app.models import Student
 from django.db.models import Avg, Count
 from django.contrib import messages
+import threading
+
 
 class BrowseCoursesView(LoginRequiredMixin,View):
     @csrf_exempt
@@ -176,18 +178,22 @@ def send_enrollment_email(student, course):
     message = f"Dear {student.profile.full_name},\n\nYou have successfully enrolled in the course: {course.title}.\n\nBest Regards,\nV-le@rn"
     recipient_email = student.email
 
-    try:
-        send_mail(
-            subject,
-            message,
-            settings.DEFAULT_FROM_EMAIL,  # Ensure you have this in settings
-            [recipient_email],
-            fail_silently=False,
-        )
-        print("Enrollment email sent successfully")
-        print(f"Sending email to: {student.email}")
-    except Exception as e:
-        print(f"Error sending email: {e}")
+    def send_email():
+        try:
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [recipient_email],
+                fail_silently=False,
+            )
+            print(f"Enrollment email sent to: {student.email}")
+        except Exception as e:
+            print(f"Error sending email: {e}")
+
+    # Run email sending in a separate thread
+    email_thread = threading.Thread(target=send_email)
+    email_thread.start()
 
 client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 

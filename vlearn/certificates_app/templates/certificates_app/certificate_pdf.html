@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Certificate</title>
+    <style>
+        @page {
+            size: letter landscape;
+            margin: 2cm;
+        }
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .certificate {
+            border: 2px solid #000;
+            padding: 40px;
+            text-align: center;
+        }
+        .certificate-title {
+            font-size: 28px;
+            margin-bottom: 30px;
+        }
+        .certificate-content {
+            font-size: 20px;
+            line-height: 2;
+        }
+        .student-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .course-name {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .certificate-footer {
+            margin-top: 40px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="certificate">
+        <div class="certificate-title">Certificate of Completion</div>
+        <div class="certificate-content">
+            <p>This is to certify that</p>
+            <div class="student-name">{{ student_name }}</div>
+            <p>has successfully completed the course</p>
+            <div class="course-name">{{ course_name }}</div>
+        </div>
+        <div class="certificate-footer">
+            <p>Issue Date: {{ issue_date }}</p>
+            <p>Certificate ID: {{ certificate_id }}</p>
+        </div>
+    </div>
+</body>
+</html>

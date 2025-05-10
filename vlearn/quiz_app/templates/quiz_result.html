@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Result</title>
+    <style>
+        /* Add some styling for result page */
+        .result-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .result-header {
+            text-align: center;
+        }
+
+        .score {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .status {
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+
+        .percentage {
+            font-size: 1.2rem;
+            color: #27ae60;
+            margin-top: 20px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: #3498db;
+            font-size: 1rem;
+            display: block;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .back-link:hover {
+            color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+
+<div class="result-container">
+    <div class="result-header">
+        <h1>Quiz Result</h1>
+    </div>
+
+    {% if results %}
+        {% for result in results %}
+            <div class="score">
+                Score: {{ result.score }} / {{ result.quiz.questions.count }}
+            </div>
+
+            <div class="status">
+                Status: {{ result.status }}
+            </div>
+
+            <div class="percentage">
+                Percentage: {{ result.percentage }}%
+            </div>
+            <hr>
+        {% endfor %}
+    {% else %}
+        <p>No result found for this quiz.</p>
+    {% endif %}
+
+    <a href="{% url 'browse_courses' %}" class="back-link">Back to Courses</a>
+</div>
+
+</body>
+</html>

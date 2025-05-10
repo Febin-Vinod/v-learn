@@ -1,0 +1,37 @@
+env
+menv
+pyc
+__pycache__
+# Ignore Python bytecode files
+*.pyc
+*.pyo
+_pycache_/
+
+# Ignore virtual environment directory
+env/
+venv/
+menv/
+
+# Ignore SQLite database
+*.sqlite3
+db.sqlite3
+migrations/
+# Ignore Django migration files (if you don't want to commit them)
+*.log
+
+# Ignore environment variables
+.env
+.menv
+
+# Ignore IDE or editor specific files (optional)
+.idea/
+.vscode/
+*.swp
+=======
+env
+menv
+pyc
+_pycache_
+
+
+

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Course</title>
+    <style>
+        /* General Reset */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+
+        /* Header */
+        h1 {
+            text-align: center;
+            color: #343a40;
+            margin-top: 20px;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #495057;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-bottom: 10px;
+            color: #6c757d;
+        }
+
+        /* Form Container */
+        form {
+            max-width: 800px;
+            margin: 30px auto;
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px 30px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Labels and Inputs */
+        form label {
+            font-weight: 600;
+            color: #495057;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        form input, form select, form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            background: #ffffff;
+            font-size: 1rem;
+            color: #495057;
+        }
+
+        form input:focus, form select:focus, form textarea:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        /* Submit Button */
+        form button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            background: #007bff;
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        form button:hover {
+            background-color: #0056b3;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* New Category Field */
+        #new-category-field {
+            display: none;
+            margin-top: 10px;
+        }
+
+        /* Link */
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1rem;
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        /* Video Section */
+        #video-form-container {
+            margin-top: 20px;
+            background: #f8f9fa;
+            padding: 15px;
+            border: 1px dashed #ced4da;
+            border-radius: 5px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            form {
+                padding: 15px 20px;
+            }
+
+            form button {
+                font-size: 0.9rem;
+            }
+
+            a {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+    <script>
+        function toggleNewCategoryField() {
+            const categoryField = document.getElementById('id_category');
+            const newCategoryField = document.getElementById('new-category-field');
+
+            // Check if the selected value is "others"
+            if (categoryField.value === 'others') {
+                newCategoryField.style.display = 'block';
+            } else {
+                newCategoryField.style.display = 'none';
+                document.getElementById('id_new_category').value = ''; // Clear the field if hidden
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            toggleNewCategoryField(); // Initialize visibility on page load
+            document.getElementById('id_category').addEventListener('change', toggleNewCategoryField);
+        });
+    </script>
+</head>
+<body>
+    <h1>Add a New Course</h1>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Render the updated course form with all fields -->
+        <h2>Course Information</h2>
+        
+        <!-- Course Title -->
+        <label for="id_title">Title:</label>
+        {{ course_form.title }}
+        
+        <!-- Course Description -->
+        <label for="id_description">Description:</label>
+        {{ course_form.description }}
+        
+        <!-- Category Field -->
+        <label for="id_category">Category:</label>
+        {{ course_form.category }}
+
+        <!-- New Category Input (Appears only when "Others" is selected in category) -->
+        <div id="new-category-field">
+            <label for="id_new_category">New Category:</label>
+            <input type="text" id="id_new_category" name="new_category">
+        </div>
+
+        <!-- Course Image -->
+        <label for="id_image">Image:</label>
+        {{ course_form.image }}
+
+        <!-- Course Duration -->
+        <label for="id_duration">Duration:</label>
+        {{ course_form.duration }}
+
+        <!-- Course Price -->
+        <label for="id_price">Price:</label>
+        {{ course_form.price }}
+
+        <!-- Single Video Form Section -->
+        <h2>Video Information</h2>
+        <div id="video-form-container">
+            <h3>Video</h3>
+            {{ video_form.as_p }}
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit">Add Course</button>
+    </form>
+
+    <a href="{% url 'my_courses' %}">View My Courses</a>
+</body>
+</html>

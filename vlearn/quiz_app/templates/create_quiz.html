@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Quiz</title>
+</head>
+<body>
+    <h1>Create Quiz for Course: {{ course.title }}</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ quiz_form.as_p }}
+        <button type="submit">Create Quiz</button>
+    </form>
+    <a href="{% url 'quiz_list' course.id %}">Back to Quiz List</a>
+</body>
+</html>
